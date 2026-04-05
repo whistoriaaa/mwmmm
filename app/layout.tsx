@@ -19,7 +19,7 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Shobirine",
+  title: "Shobiryne",
   description: "Portfolio of a photographer and videographer",
 }
 

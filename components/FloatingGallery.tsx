@@ -6,6 +6,7 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { motion, AnimatePresence } from "motion/react"
+import ParticleField3D from "./ParticleField3D"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -253,6 +254,8 @@ export default function FloatingGallery() {
     <>
       <div ref={sectionRef} style={{ height: "350vh" }}>
         <div ref={wrapperRef} className="relative w-full h-screen overflow-hidden">
+
+             <ParticleField3D />
           {renderSet(photoSets[0], set1Ref, 0)}
           {renderSet(photoSets[1], set2Ref, 6)}
           {renderSet(photoSets[2], set3Ref, 12)}
@@ -267,7 +270,7 @@ export default function FloatingGallery() {
                 textShadow: "0 0 120px rgba(211,179,102,0.2), 0 0 40px rgba(16,49,58,0.8)"
               }}
             >
-              Shobirine
+              Shobiryne
             </h1>
            <p
   className="mt-4 text-sm tracking-[0.45em] uppercase font-light"

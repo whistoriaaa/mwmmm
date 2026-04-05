@@ -175,7 +175,7 @@ export default function Navbar() {
             className="italic tracking-wider"
             style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", color: "var(--gold)" }}
           >
-            Shobirine
+            Shobiryne
           </Link>
 
           {/* Desktop */}
