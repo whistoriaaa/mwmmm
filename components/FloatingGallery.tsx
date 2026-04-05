@@ -11,14 +11,8 @@ import ParticleField3D from "./ParticleField3D"
 gsap.registerPlugin(ScrollTrigger)
 
 type Photo = {
-  id: string
-  src: string
-  w: number
-  h: number
-  left: string
-  top: string
-  size: string
-  depth: number
+  id: string; src: string; w: number; h: number
+  left: string; top: string; size: string; depth: number
 }
 
 const photoSets: Photo[][] = [
@@ -48,23 +42,21 @@ const photoSets: Photo[][] = [
   ],
 ]
 
-// Parameter floating unik per foto
 const floatParams = [
-  { y: 14, x: 6,  rot: 1.2, dur: 3.4, delay: 0.0 },
-  { y: 10, x: 8,  rot: 0.7, dur: 2.9, delay: 0.5 },
-  { y: 16, x: 5,  rot: 1.5, dur: 3.8, delay: 0.2 },
-  { y: 11, x: 7,  rot: 1.0, dur: 3.1, delay: 0.8 },
-  { y: 18, x: 9,  rot: 1.8, dur: 4.2, delay: 0.3 },
-  { y: 9,  x: 5,  rot: 0.8, dur: 2.7, delay: 0.6 },
+  { y: 12, x: 5,  rot: 1.0, dur: 3.4, delay: 0.0 },
+  { y: 8,  x: 6,  rot: 0.6, dur: 2.9, delay: 0.5 },
+  { y: 13, x: 4,  rot: 1.2, dur: 3.8, delay: 0.2 },
+  { y: 9,  x: 6,  rot: 0.8, dur: 3.1, delay: 0.8 },
+  { y: 14, x: 7,  rot: 1.4, dur: 4.2, delay: 0.3 },
+  { y: 7,  x: 4,  rot: 0.6, dur: 2.7, delay: 0.6 },
 ]
 
+// ─── Lightbox ──────────────────────────────────────────────────
 function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
   return (
     <motion.div
       key="lightbox-backdrop"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.35 }}
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: "rgba(8,18,22,0.94)", backdropFilter: "blur(16px)" }}
@@ -74,11 +66,10 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
         layoutId={`photo-${photo.id}`}
         className="relative overflow-hidden rounded-sm"
         style={{ maxWidth: "min(85vw, 900px)", maxHeight: "85vh" }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       >
-        <Image
-          src={photo.src} alt={`Portfolio ${photo.id}`}
+        <Image src={photo.src} alt={`Portfolio ${photo.id}`}
           width={photo.w} height={photo.h}
           className="w-full h-auto object-cover"
           style={{ maxHeight: "85vh", objectFit: "contain" }}
@@ -108,11 +99,18 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
   )
 }
 
+// ─── PhotoCard ─────────────────────────────────────────────────
+// parallaxRef → outer div → dikontrol mouse parallax (x/y)
+// floatRef    → inner div → dikontrol floating idle (y/rotate)
+// Dua layer terpisah = tidak ada konflik properti GSAP
 function PhotoCard({
-  photo, index, refCallback, onOpen,
+  photo, index,
+  parallaxRefCb, floatRefCb,
+  onOpen,
 }: {
   photo: Photo; index: number
-  refCallback: (el: HTMLDivElement | null) => void
+  parallaxRefCb: (el: HTMLDivElement | null) => void
+  floatRefCb:   (el: HTMLDivElement | null) => void
   onOpen: (photo: Photo) => void
 }) {
   const [mobilePreview, setMobilePreview] = useState(false)
@@ -128,169 +126,215 @@ function PhotoCard({
   }, [mobilePreview, onOpen, photo])
 
   return (
+    // Outer: posisi + mouse parallax
     <div
-      ref={refCallback}
-      className="absolute overflow-hidden rounded-sm shadow-2xl cursor-pointer group"
-      style={{ left: photo.left, top: photo.top, width: photo.size }}
+      ref={parallaxRefCb}
+      className="absolute cursor-pointer group"
+      style={{
+        left: photo.left, top: photo.top, width: photo.size,
+        // GPU compositing — mencegah repaint saat transform
+        willChange: "transform",
+      }}
       onClick={handleClick}
     >
-      <motion.div layoutId={`photo-${photo.id}`} transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}>
-        <Image
-          src={photo.src} alt={`Portfolio ${photo.id}`}
-          width={photo.w} height={photo.h}
-          className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-          priority={index < 3} loading={index < 3 ? "eager" : "lazy"}
-        />
-      </motion.div>
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center"
-        style={{ background: "rgba(8,18,22,0.5)" }}>
-        <span className="text-xs tracking-widest uppercase" style={{ color: "var(--gold)" }}>Lihat</span>
+      {/* Inner: floating idle — properti y/rotate terpisah dari outer */}
+      <div
+        ref={floatRefCb}
+        style={{ willChange: "transform" }}
+      >
+        <motion.div
+          layoutId={`photo-${photo.id}`}
+          className="overflow-hidden rounded-sm shadow-2xl"
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Image
+            src={photo.src} alt={`Portfolio ${photo.id}`}
+            width={photo.w} height={photo.h}
+            className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+            priority={index < 3} loading={index < 3 ? "eager" : "lazy"}
+          />
+        </motion.div>
+
+        <div
+          className="absolute inset-0 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center"
+          style={{ background: "rgba(8,18,22,0.5)" }}
+        >
+          <span className="text-xs tracking-widest uppercase" style={{ color: "var(--gold)" }}>Lihat</span>
+        </div>
+
+        <AnimatePresence>
+          {mobilePreview && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 rounded-sm flex flex-col items-center justify-center gap-2 md:hidden"
+              style={{ background: "rgba(8,18,22,0.65)", backdropFilter: "blur(2px)" }}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" strokeWidth="1.5" strokeLinecap="round">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+              </svg>
+              <span className="text-xs tracking-widest uppercase" style={{ color: "var(--cyan)" }}>Tap lagi</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-      <AnimatePresence>
-        {mobilePreview && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-2 md:hidden"
-            style={{ background: "rgba(8,18,22,0.65)", backdropFilter: "blur(2px)" }}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" strokeWidth="1.5" strokeLinecap="round">
-              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-            </svg>
-            <span className="text-xs tracking-widest uppercase" style={{ color: "var(--cyan)" }}>Tap lagi</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
 
+// ─── FloatingGallery ───────────────────────────────────────────
 export default function FloatingGallery() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const set1Ref    = useRef<HTMLDivElement>(null)
-  const set2Ref    = useRef<HTMLDivElement>(null)
-  const set3Ref    = useRef<HTMLDivElement>(null)
-  const itemsRef   = useRef<(HTMLDivElement | null)[]>([])
+  const sectionRef  = useRef<HTMLDivElement>(null)
+  const wrapperRef  = useRef<HTMLDivElement>(null)
+  const set1Ref     = useRef<HTMLDivElement>(null)
+  const set2Ref     = useRef<HTMLDivElement>(null)
+  const set3Ref     = useRef<HTMLDivElement>(null)
+
+  // Dua array ref: outer (parallax) dan inner (float)
+  const parallaxRefs = useRef<(HTMLDivElement | null)[]>([])
+  const floatRefs    = useRef<(HTMLDivElement | null)[]>([])
+
   const [activePhoto, setActivePhoto] = useState<Photo | null>(null)
 
   useGSAP(() => {
 
-    // ── Fungsi: floating idle otomatis ──────────────────────
-    // Menggunakan gsap.to dengan repeat:-1, yoyo:true
-    // Setiap foto punya durasi & amplitudo berbeda → tidak kompak/kaku
-    const startFloating = (el: HTMLDivElement, idx: number) => {
+    // ── Floating idle: hanya menyentuh floatRef (inner) ──────
+    // floatRef mengontrol y + rotate saja → tidak bentrok dengan parallaxRef
+    const startFloating = (floatEl: HTMLDivElement, idx: number) => {
       const p = floatParams[idx % floatParams.length]
 
-      // Y — naik turun
-      gsap.to(el, {
-        y:        `+=${p.y}`,
-        duration:  p.dur,
-        repeat:   -1,
-        yoyo:      true,
-        ease:     "sine.inOut",
-        delay:     p.delay,
+      gsap.to(floatEl, {
+        y: `+=${p.y}`, duration: p.dur,
+        repeat: -1, yoyo: true, ease: "sine.inOut", delay: p.delay,
+        force3D: true,
       })
-
-      // X — geser sedikit (durasi lebih lambat dari Y)
-      gsap.to(el, {
-        x:        `+=${p.x}`,
-        duration:  p.dur * 1.5,
-        repeat:   -1,
-        yoyo:      true,
-        ease:     "sine.inOut",
-        delay:     p.delay + 0.4,
-      })
-
-      // Rotate — miring tipis
-      gsap.to(el, {
-        rotate:   `+=${p.rot}`,
-        duration:  p.dur * 2.1,
-        repeat:   -1,
-        yoyo:      true,
-        ease:     "sine.inOut",
-        delay:     p.delay + 0.8,
+      gsap.to(floatEl, {
+        rotate: `+=${p.rot}`, duration: p.dur * 2.0,
+        repeat: -1, yoyo: true, ease: "sine.inOut", delay: p.delay + 0.6,
+        force3D: true,
       })
     }
 
-    // ── Entrance Set 1 + langsung mulai floating ────────────
-    itemsRef.current.slice(0, 6).forEach((el, i) => {
+    // ── Entrance Set 1 ────────────────────────────────────────
+    parallaxRefs.current.slice(0, 6).forEach((el, i) => {
       if (!el) return
+      const floatEl = floatRefs.current[i]
       gsap.from(el, {
         opacity: 0, y: 40, scale: 0.92,
         duration: 1.2, delay: i * 0.1, ease: "power3.out",
-        onComplete: () => startFloating(el, i),  // ← mulai float setelah muncul
+        force3D: true,
+        onComplete: () => { if (floatEl) startFloating(floatEl, i) },
       })
     })
 
-    // ── Set 2 & 3 sembunyikan dulu ──────────────────────────
-    gsap.set(set2Ref.current, { x: "110%", opacity: 0 })
-    gsap.set(set3Ref.current, { x: "110%", opacity: 0 })
+    // ── Set 2 & 3: reset bersih, container di luar kanan ─────
+    gsap.set(set2Ref.current, { x: "110%", opacity: 0, force3D: true })
+    gsap.set(set3Ref.current, { x: "110%", opacity: 0, force3D: true })
 
-    // ── Scroll timeline ─────────────────────────────────────
+    parallaxRefs.current.slice(6, 18).forEach(el => {
+      if (el) gsap.set(el, { x: 0, y: 0, opacity: 1, force3D: true })
+    })
+    floatRefs.current.slice(6, 18).forEach(el => {
+      if (el) gsap.set(el, { y: 0, rotate: 0, force3D: true })
+    })
+
+    // ── Scroll timeline ───────────────────────────────────────
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
         end: "+=250%",
         pin: wrapperRef.current,
-        scrub: 1.2,
+        scrub: 0.9,          // lebih responsif dari 1.2
         anticipatePin: 1,
+        fastScrollEnd: true, // ← langsung snap ke posisi akhir saat scroll cepat
       },
     })
 
-    tl.to(set1Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut" })
-      .to(set2Ref.current, { x: "0%", opacity: 1, duration: 1, ease: "power2.inOut",
-        onComplete: () => {
-          // Mulai floating Set 2 setelah slide masuk
-          itemsRef.current.slice(6, 12).forEach((el, i) => {
-            if (el) startFloating(el, i)
-          })
-        }
-      }, "<")
-      .to(set2Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut" }, "+=0.3")
-      .to(set3Ref.current, { x: "0%", opacity: 1, duration: 1, ease: "power2.inOut",
-        onComplete: () => {
-          // Mulai floating Set 3 setelah slide masuk
-          itemsRef.current.slice(12, 18).forEach((el, i) => {
-            if (el) startFloating(el, i)
-          })
-        }
-      }, "<")
+    tl.to(set1Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut", force3D: true })
+      .to(set2Ref.current, { x: "0%",    opacity: 1, duration: 1, ease: "power2.inOut", force3D: true }, "<")
+      .to(set2Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut", force3D: true }, "+=0.3")
+      .to(set3Ref.current, { x: "0%",    opacity: 1, duration: 1, ease: "power2.inOut", force3D: true }, "<")
 
-    // ── Mouse parallax — ditambahkan DI ATAS floating ───────
-    // Menggunakan gsap.quickTo agar lebih ringan & tidak konflik
-    const quickX = itemsRef.current.map(el => el ? gsap.quickTo(el, "x", { duration: 1.4, ease: "power2.out" }) : null)
-    const quickY = itemsRef.current.map(el => el ? gsap.quickTo(el, "y", { duration: 1.4, ease: "power2.out" }) : null)
+    // ── Set 2 floating: trigger saat container benar-benar masuk ─
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: "29% top",
+      end: "60% top",
+      once: true,
+      onEnter: () => {
+        floatRefs.current.slice(6, 12).forEach((el, i) => {
+          if (el) startFloating(el, i)
+        })
+      },
+    })
+
+    // ── Set 3 floating ────────────────────────────────────────
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: "63% top",
+      once: true,
+      onEnter: () => {
+        floatRefs.current.slice(12, 18).forEach((el, i) => {
+          if (el) startFloating(el, i)
+        })
+      },
+    })
+
+    // ── Mouse parallax via RAF ────────────────────────────────
+    // RAF loop = 1 update per frame, tidak ada konflik dengan GSAP ticker
+    // Hanya menyentuh parallaxRef (outer) → floatRef (inner) aman
+    let mouseX = 0, mouseY = 0
+    let rafId = 0
+
+    // Lerp target per elemen
+    const targets = parallaxRefs.current.map((_, i) => {
+      const setIdx = Math.floor(i / 6)
+      const depth  = photoSets[setIdx]?.[i % 6]?.depth ?? 1
+      return { cx: 0, cy: 0, depth }
+    })
 
     const onMouseMove = (e: MouseEvent) => {
-      const xNorm = e.clientX / window.innerWidth  - 0.5
-      const yNorm = e.clientY / window.innerHeight - 0.5
-      itemsRef.current.forEach((el, i) => {
-        if (!el || !quickX[i] || !quickY[i]) return
-        const setIdx = Math.floor(i / 6)
-        const depth  = photoSets[setIdx][i % 6].depth
-        quickX[i]!(xNorm * 50 * depth)
-        quickY[i]!(yNorm * 35 * depth)
-      })
+      mouseX = (e.clientX / window.innerWidth  - 0.5) * 50
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 35
     }
 
-    window.addEventListener("mousemove", onMouseMove)
-    return () => window.removeEventListener("mousemove", onMouseMove)
+    const tick = () => {
+      parallaxRefs.current.forEach((el, i) => {
+        if (!el) return
+        const t = targets[i]
+        if (!t) return
+        // Lerp menuju target → smooth tanpa GSAP tween
+        t.cx += (mouseX * t.depth - t.cx) * 0.06
+        t.cy += (mouseY * t.depth - t.cy) * 0.06
+        gsap.set(el, { x: t.cx, y: t.cy, force3D: true })
+      })
+      rafId = requestAnimationFrame(tick)
+    }
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true })
+    rafId = requestAnimationFrame(tick)
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove)
+      cancelAnimationFrame(rafId)
+    }
 
   }, { scope: sectionRef })
 
+  // ── Render helper ──────────────────────────────────────────
   const renderSet = (
     setPhotos: Photo[],
-    ref: React.RefObject<HTMLDivElement | null>,
+    containerRef: React.RefObject<HTMLDivElement | null>,
     startIdx: number
   ) => (
-    <div ref={ref} className="absolute inset-0">
+    <div ref={containerRef} className="absolute inset-0">
       {setPhotos.map((photo, i) => (
         <PhotoCard
           key={photo.id}
           photo={photo}
           index={startIdx + i}
-          refCallback={(el) => { itemsRef.current[startIdx + i] = el }}
+          parallaxRefCb={el => { parallaxRefs.current[startIdx + i] = el }}
+          floatRefCb={el    => { floatRefs.current[startIdx + i]    = el }}
           onOpen={setActivePhoto}
         />
       ))}
