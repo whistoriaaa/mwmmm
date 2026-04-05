@@ -1,11 +1,20 @@
-import Image from "next/image";
+import FloatingGallery from "@/components/FloatingGallery"
+import MasonryGrid from "@/components/MasonryGrid"
 
 export default function PortofolioPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-white text-6xl font-thin tracking-widest">
-        Portfolio
-      </h1>
-    </div>
-  );
+    <>
+      <FloatingGallery />
+
+      <div
+        className="w-full h-px max-w-5xl mx-auto my-0"
+        style={{
+          background: "linear-gradient(to right, transparent, var(--cyan), transparent)",
+          opacity: 0.25
+        }}
+      />
+
+      <MasonryGrid />
+    </>
+  )
 }

@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/Navbar";
+import type { Metadata } from "next"
+import { Cormorant_Garamond, DM_Sans } from "next/font/google"
+import "./globals.css"
+import Navbar from "@/components/Navbar"
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -9,33 +9,30 @@ const cormorant = Cormorant_Garamond({
   style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
-});
+})
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
   variable: "--font-body",
   display: "swap",
-});
+})
+
 export const metadata: Metadata = {
-  title: "Whistoriaaa",
+  title: "Shobirine",
   description: "Portfolio of a photographer and videographer",
-};
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${cormorant.variable} ${dmSans.variable}`}>
       <body className="min-h-full flex flex-col">
-        <div className="fixed inset-0 -z-10 bg-black"/>
-
+        <div className="fixed inset-0 -z-10" style={{ backgroundColor: "var(--background)" }} />
         <Navbar />
-
         <main>{children}</main>
       </body>
     </html>
-  );
+  )
 }
