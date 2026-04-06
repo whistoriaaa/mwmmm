@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shobiryne — Portfolio Website
 
-## Getting Started
+> A cinematic photography & videography portfolio with an immersive scroll experience inspired by the tactile feel of a Fujifilm film camera.
 
-First, run the development server:
+![Preview](./public/preview.png)
+
+## ✨ Features
+
+- **Fujifilm Dial 3D** — A large machined-aluminum-style dial rendered in pure CSS + GSAP that rotates as you scroll, mimicking the physical dial of a Fujifilm camera
+- **Floating Gallery** — Photo sets with idle float animation, mouse parallax, and smooth set transitions on scroll
+- **Lightbox with Swipe** — Full-screen lightbox supporting touch swipe gesture and keyboard navigation
+- **Particle Field** — Subtle ambient particle background for depth
+- **Dark Cinematic Theme** — Deep navy/black palette with gold accent (`#d3b366`) and cyan highlight (`#22b3d0`)
+- **Fully Responsive** — Optimized for mobile and desktop
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Library / Tool |
+|---|---|
+| Framework | [Next.js 14](https://nextjs.org/) (App Router) |
+| Language | TypeScript |
+| Animation | [GSAP](https://gsap.com/) + [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) |
+| Motion | [Framer Motion](https://www.framer.com/motion/) |
+| Styling | CSS Modules + CSS Variables |
+| Font | Cormorant Garamond (Google Fonts) + Inter |
+| Deployment | [Vercel](https://vercel.com/) |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js ≥ 18
+- npm / yarn / pnpm
+
+### Installation
 
 ```bash
+# Clone repository
+git clone https://github.com/yourusername/shobiryne-portfolio.git
+cd shobiryne-portfolio
+
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📁 Project Structure
