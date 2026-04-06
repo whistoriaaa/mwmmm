@@ -56,7 +56,7 @@ function HamburgerIcon({ isOpen }: { isOpen: boolean }) {
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       />
       <motion.span
-        className="block h-px origin-left"
+        className="block h-px w-full origin-center"
         style={{ backgroundColor: "var(--text-primary)" }}
         animate={isOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 0.75 }}
         transition={{ duration: 0.2 }}

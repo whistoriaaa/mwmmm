@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from "motion/re
 import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 
+// ─── Data ──────────────────────────────────────────────────────
 const sampleVideos = [
   "https://assets.mixkit.co/videos/3991/3991-720.mp4",
   "https://assets.mixkit.co/videos/4927/4927-720.mp4",
@@ -14,38 +15,49 @@ const sampleVideos = [
   "https://assets.mixkit.co/videos/680/680-720.mp4",
 ]
 
-const allPhotos = [
-  { id: 1,  src: "https://picsum.photos/seed/wm1/600/900",   w: 600, h: 900,  category: "photo" },
-  { id: 2,  src: sampleVideos[0],                             w: 800, h: 450,  category: "video" },
-  { id: 3,  src: "https://picsum.photos/seed/wm3/600/800",   w: 600, h: 800,  category: "photo" },
-  { id: 4,  src: "https://picsum.photos/seed/wm4/700/500",   w: 700, h: 500,  category: "photo" },
-  { id: 5,  src: sampleVideos[1],                             w: 800, h: 450,  category: "video" },
-  { id: 6,  src: "https://picsum.photos/seed/wm6/800/600",   w: 800, h: 600,  category: "photo" },
-  { id: 7,  src: "https://picsum.photos/seed/wm7/500/800",   w: 500, h: 800,  category: "photo" },
-  { id: 8,  src: sampleVideos[2],                             w: 800, h: 450,  category: "video" },
-  { id: 9,  src: "https://picsum.photos/seed/wm9/600/750",   w: 600, h: 750,  category: "photo" },
-  { id: 10, src: "https://picsum.photos/seed/wm10/800/550",  w: 800, h: 550,  category: "photo" },
-  { id: 11, src: sampleVideos[3],                             w: 800, h: 450,  category: "video" },
-  { id: 12, src: "https://picsum.photos/seed/wm12/700/900",  w: 700, h: 900,  category: "photo" },
-  { id: 13, src: "https://picsum.photos/seed/wm13/550/820",  w: 550, h: 820,  category: "photo" },
-  { id: 14, src: sampleVideos[4],                             w: 800, h: 450,  category: "video" },
-  { id: 15, src: "https://picsum.photos/seed/wm15/640/960",  w: 640, h: 960,  category: "photo" },
-  { id: 16, src: "https://picsum.photos/seed/wm16/750/500",  w: 750, h: 500,  category: "photo" },
-  { id: 17, src: sampleVideos[5],                             w: 800, h: 450,  category: "video" },
-  { id: 18, src: "https://picsum.photos/seed/wm18/820/550",  w: 820, h: 550,  category: "photo" },
-  { id: 19, src: "https://picsum.photos/seed/wm19/580/870",  w: 580, h: 870,  category: "photo" },
-  { id: 20, src: sampleVideos[6],                             w: 800, h: 450,  category: "video" },
-  { id: 21, src: "https://picsum.photos/seed/wm21/620/930",  w: 620, h: 930,  category: "photo" },
-  { id: 22, src: "https://picsum.photos/seed/wm22/780/520",  w: 780, h: 520,  category: "photo" },
-  { id: 23, src: "https://picsum.photos/seed/wm23/520/780",  w: 520, h: 780,  category: "photo" },
-  { id: 24, src: "https://picsum.photos/seed/wm24/860/560",  w: 860, h: 560,  category: "photo" },
+// ─── Types ─────────────────────────────────────────────────────
+type Item = {
+  id: number
+  src: string
+  w: number
+  h: number
+  category: "potrait" | "event" | "product"
+  type: "photo" | "video"
+  highlight: boolean
+}
+
+const filters = ["all", "potrait", "event", "product"] as const
+type Filter = typeof filters[number]
+
+// ─── Dataset ───────────────────────────────────────────────────
+const allPhotos: Item[] = [
+  { id: 1,  src: "https://picsum.photos/seed/wm1/600/900",  w: 600, h: 900,  category: "potrait", type: "photo", highlight: true  },
+  { id: 2,  src: sampleVideos[0],                            w: 800, h: 450,  category: "potrait", type: "video", highlight: false },
+  { id: 3,  src: "https://picsum.photos/seed/wm3/600/800",  w: 600, h: 800,  category: "potrait", type: "photo", highlight: true  },
+  { id: 4,  src: "https://picsum.photos/seed/wm4/700/500",  w: 700, h: 500,  category: "potrait", type: "photo", highlight: false },
+  { id: 5,  src: sampleVideos[1],                            w: 800, h: 450,  category: "event",   type: "video", highlight: false },
+  { id: 6,  src: "https://picsum.photos/seed/wm6/800/600",  w: 800, h: 600,  category: "event",   type: "photo", highlight: true  },
+  { id: 7,  src: "https://picsum.photos/seed/wm7/500/800",  w: 500, h: 800,  category: "event",   type: "photo", highlight: false },
+  { id: 8,  src: sampleVideos[2],                            w: 800, h: 450,  category: "event",   type: "video", highlight: false },
+  { id: 9,  src: "https://picsum.photos/seed/wm9/600/750",  w: 600, h: 750,  category: "event",   type: "photo", highlight: true  },
+  { id: 10, src: "https://picsum.photos/seed/wm10/800/550", w: 800, h: 550,  category: "event",   type: "photo", highlight: false },
+  { id: 11, src: sampleVideos[3],                            w: 800, h: 450,  category: "event",   type: "video", highlight: false },
+  { id: 12, src: "https://picsum.photos/seed/wm12/700/900", w: 700, h: 900,  category: "event",   type: "photo", highlight: true  },
+  { id: 13, src: "https://picsum.photos/seed/wm13/550/820", w: 550, h: 820,  category: "event",   type: "photo", highlight: false },
+  { id: 14, src: sampleVideos[4],                            w: 800, h: 450,  category: "event",   type: "video", highlight: false },
+  { id: 15, src: "https://picsum.photos/seed/wm15/640/960", w: 640, h: 960,  category: "event",   type: "photo", highlight: false },
+  { id: 16, src: "https://picsum.photos/seed/wm16/750/500", w: 750, h: 500,  category: "event",   type: "photo", highlight: false },
+  { id: 17, src: sampleVideos[5],                            w: 800, h: 450,  category: "event",   type: "video", highlight: false },
+  { id: 18, src: "https://picsum.photos/seed/wm18/820/550", w: 820, h: 550,  category: "product", type: "photo", highlight: false },
+  { id: 19, src: "https://picsum.photos/seed/wm19/580/870", w: 580, h: 870,  category: "product", type: "photo", highlight: false },
+  { id: 20, src: sampleVideos[6],                            w: 800, h: 450,  category: "product", type: "video", highlight: false },
+  { id: 21, src: "https://picsum.photos/seed/wm21/620/930", w: 620, h: 930,  category: "product", type: "photo", highlight: false },
+  { id: 22, src: "https://picsum.photos/seed/wm22/780/520", w: 780, h: 520,  category: "product", type: "photo", highlight: false },
+  { id: 23, src: "https://picsum.photos/seed/wm23/520/780", w: 520, h: 780,  category: "product", type: "photo", highlight: false },
+  { id: 24, src: "https://picsum.photos/seed/wm24/860/560", w: 860, h: 560,  category: "product", type: "photo", highlight: false },
 ]
 
-type Item = typeof allPhotos[0]
-
-const filters = ["all", "photo", "video"]
-
-// ─── Video Card ────────────────────────────────────────────────
+// ─── VideoCard ─────────────────────────────────────────────────
 function VideoCard({ src }: { src: string }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -58,21 +70,15 @@ function VideoCard({ src }: { src: string }) {
 
   return (
     <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
-      <video
-        ref={videoRef}
-        src={src}
-        loop
-        playsInline
-        className="w-full h-full object-cover"
-      />
+      <video ref={videoRef} src={src} loop playsInline className="w-full h-full object-cover" />
       <div
         className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-full"
         style={{ background: "rgba(14,40,48,0.75)", backdropFilter: "blur(6px)" }}
       >
         <svg width="8" height="9" viewBox="0 0 8 9" fill="var(--pink)">
-          <path d="M0 0.5L8 4.5L0 8.5V0.5Z"/>
+          <path d="M0 0.5L8 4.5L0 8.5V0.5Z" />
         </svg>
-        <span className="text-xs tracking-widest uppercase" style={{ color: "var(--pink)", fontSize: "10px" }}>
+        <span className="tracking-widest uppercase" style={{ color: "var(--pink)", fontSize: "10px" }}>
           Video
         </span>
       </div>
@@ -80,7 +86,7 @@ function VideoCard({ src }: { src: string }) {
   )
 }
 
-// ─── Lightbox ─────────────────────────────────────────────────
+// ─── Lightbox ──────────────────────────────────────────────────
 function Lightbox({
   item,
   items,
@@ -94,37 +100,27 @@ function Lightbox({
   onPrev: () => void
   onNext: () => void
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const videoRef   = useRef<HTMLVideoElement>(null)
   const currentIdx = items.findIndex(i => i.id === item.id)
-  const card2 = items[(currentIdx - 1 + items.length) % items.length]
-  const card3 = items[(currentIdx - 2 + items.length) % items.length]
+  const card2      = items[(currentIdx - 1 + items.length) % items.length]
+  const card3      = items[(currentIdx - 2 + items.length) % items.length]
 
-  // ── Swipe gesture ─────────────────────────────────────────
-  const x = useMotionValue(0)
-  const rotate = useTransform(x, [-300, 0, 300], [-18, 0, 18])
-  const cardOpacity = useTransform(x, [-250, -100, 0, 100, 250], [0, 1, 1, 1, 0])
+  const x                   = useMotionValue(0)
+  const rotate              = useTransform(x, [-300, 0, 300], [-18, 0, 18])
+  const cardOpacity         = useTransform(x, [-250, -100, 0, 100, 250], [0, 1, 1, 1, 0])
   const overlayLeftOpacity  = useTransform(x, [-150, -60, 0], [0.85, 0.4, 0])
-  const overlayRightOpacity = useTransform(x, [0, 60, 150],   [0, 0.4, 0.85])
+  const overlayRightOpacity = useTransform(x, [0, 60, 150], [0, 0.4, 0.85])
 
   const handleDragEnd = (
     _: PointerEvent,
     info: { offset: { x: number }; velocity: { x: number } }
   ) => {
-    const threshold = 80
-    const velocityThreshold = 500
-    if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
-      onNext()
-    } else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
-      onPrev()
-    }
+    if (info.offset.x < -80 || info.velocity.x < -500) onNext()
+    else if (info.offset.x > 80 || info.velocity.x > 500) onPrev()
   }
 
-  // Reset x saat item berganti
-  useEffect(() => {
-    x.set(0)
-  }, [item, x])
+  useEffect(() => { x.set(0) }, [item, x])
 
-  // Keyboard navigation
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape")     onClose()
@@ -135,7 +131,6 @@ function Lightbox({
     return () => window.removeEventListener("keydown", onKey)
   }, [onClose, onNext, onPrev])
 
-  // Video autoplay saat item berganti
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = false
@@ -161,14 +156,12 @@ function Lightbox({
       style={{ backgroundColor: "rgba(8,18,22,0.96)", backdropFilter: "blur(20px)" }}
       onClick={onClose}
     >
-      {/* ── Card Stack Container ──────────────────────────── */}
       <div
         className="relative flex items-center justify-center"
         style={{ width: "min(78vw, 860px)", height: "80vh" }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
-
-        {/* Card 3 — paling belakang */}
+        {/* Card 3 — belakang */}
         <motion.div
           style={cardStyle}
           initial={{ rotate: 0, x: 0, y: 0, scale: 1, opacity: 0 }}
@@ -176,12 +169,8 @@ function Lightbox({
           exit={{ rotate: 0, x: 0, y: 0, scale: 1, opacity: 0 }}
           transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
         >
-          {card3.category === "photo" ? (
-            <Image
-              src={card3.src}
-              alt=""
-              width={card3.w}
-              height={card3.h}
+          {card3.type === "photo" ? (
+            <Image src={card3.src} alt="" width={card3.w} height={card3.h}
               className="w-full h-auto object-cover"
               style={{ maxHeight: "80vh", filter: "brightness(0.35) saturate(0.5)" }}
             />
@@ -198,12 +187,8 @@ function Lightbox({
           exit={{ rotate: 0, x: 0, y: 0, scale: 1, opacity: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.02 }}
         >
-          {card2.category === "photo" ? (
-            <Image
-              src={card2.src}
-              alt=""
-              width={card2.w}
-              height={card2.h}
+          {card2.type === "photo" ? (
+            <Image src={card2.src} alt="" width={card2.w} height={card2.h}
               className="w-full h-auto object-cover"
               style={{ maxHeight: "80vh", filter: "brightness(0.55) saturate(0.6)" }}
             />
@@ -215,14 +200,7 @@ function Lightbox({
         {/* Card 1 — depan + swipe */}
         <motion.div
           layoutId={`masonry-${item.id}`}
-          style={{
-            ...cardStyle,
-            position: "relative",
-            x,
-            rotate,
-            opacity: cardOpacity,
-            cursor: "grab",
-          }}
+          style={{ ...cardStyle, position: "relative", x, rotate, opacity: cardOpacity, cursor: "grab" }}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.18}
@@ -230,54 +208,32 @@ function Lightbox({
           whileTap={{ cursor: "grabbing" }}
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* Overlay hint NEXT (swipe kiri) */}
-          <motion.div
-            style={{
-              position: "absolute", inset: 0, zIndex: 10,
-              background: "linear-gradient(135deg, rgba(34,179,208,0.35) 0%, transparent 60%)",
-              borderRadius: "4px",
-              opacity: overlayLeftOpacity,
-              display: "flex", alignItems: "center", justifyContent: "flex-end",
-              paddingRight: "24px", pointerEvents: "none",
-            }}
-          >
-            <span style={{ color: "var(--cyan)", fontSize: "13px", letterSpacing: "0.25em", fontWeight: 600 }}>
-              NEXT →
-            </span>
+          <motion.div style={{
+            position: "absolute", inset: 0, zIndex: 10,
+            background: "linear-gradient(135deg, rgba(34,179,208,0.35) 0%, transparent 60%)",
+            borderRadius: "4px", opacity: overlayLeftOpacity,
+            display: "flex", alignItems: "center", justifyContent: "flex-end",
+            paddingRight: "24px", pointerEvents: "none",
+          }}>
+            <span style={{ color: "var(--cyan)", fontSize: "13px", letterSpacing: "0.25em", fontWeight: 600 }}>NEXT →</span>
           </motion.div>
 
-          {/* Overlay hint PREV (swipe kanan) */}
-          <motion.div
-            style={{
-              position: "absolute", inset: 0, zIndex: 10,
-              background: "linear-gradient(225deg, rgba(207,83,155,0.35) 0%, transparent 60%)",
-              borderRadius: "4px",
-              opacity: overlayRightOpacity,
-              display: "flex", alignItems: "center", justifyContent: "flex-start",
-              paddingLeft: "24px", pointerEvents: "none",
-            }}
-          >
-            <span style={{ color: "var(--pink)", fontSize: "13px", letterSpacing: "0.25em", fontWeight: 600 }}>
-              ← PREV
-            </span>
+          <motion.div style={{
+            position: "absolute", inset: 0, zIndex: 10,
+            background: "linear-gradient(225deg, rgba(207,83,155,0.35) 0%, transparent 60%)",
+            borderRadius: "4px", opacity: overlayRightOpacity,
+            display: "flex", alignItems: "center", justifyContent: "flex-start",
+            paddingLeft: "24px", pointerEvents: "none",
+          }}>
+            <span style={{ color: "var(--pink)", fontSize: "13px", letterSpacing: "0.25em", fontWeight: 600 }}>← PREV</span>
           </motion.div>
 
-          {/* Konten foto / video */}
-          {item.category === "video" ? (
-            <video
-              ref={videoRef}
-              src={item.src}
-              controls
-              playsInline
-              className="w-full h-auto"
-              style={{ maxHeight: "80vh" }}
-            />
+          {item.type === "video" ? (
+            <video ref={videoRef} src={item.src} controls playsInline
+              className="w-full h-auto" style={{ maxHeight: "80vh" }} />
           ) : (
-            <Image
-              src={item.src}
-              alt={`Work ${item.id}`}
-              width={item.w}
-              height={item.h}
+            <Image src={item.src} alt={`Work ${item.id}`}
+              width={item.w} height={item.h}
               className="w-full h-auto object-contain"
               style={{ maxHeight: "80vh", pointerEvents: "none", userSelect: "none" }}
             />
@@ -287,59 +243,48 @@ function Lightbox({
 
       {/* Tombol Prev */}
       <motion.button
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0 }}
-        transition={{ delay: 0.2 }}
-        onClick={(e) => { e.stopPropagation(); onPrev() }}
-        aria-label="Sebelumnya"
+        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0 }} transition={{ delay: 0.2 }}
+        onClick={e => { e.stopPropagation(); onPrev() }} aria-label="Sebelumnya"
         className="absolute left-4 md:left-8 w-11 h-11 flex items-center justify-center rounded-full border transition-colors duration-300"
         style={{ borderColor: "var(--cyan)", color: "var(--cyan)" }}
         whileHover={{ backgroundColor: "rgba(34,179,208,0.1)" }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="M15 18l-6-6 6-6"/>
+          <path d="M15 18l-6-6 6-6" />
         </svg>
       </motion.button>
 
       {/* Tombol Next */}
       <motion.button
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0 }}
-        transition={{ delay: 0.2 }}
-        onClick={(e) => { e.stopPropagation(); onNext() }}
-        aria-label="Berikutnya"
+        initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0 }} transition={{ delay: 0.2 }}
+        onClick={e => { e.stopPropagation(); onNext() }} aria-label="Berikutnya"
         className="absolute right-4 md:right-8 w-11 h-11 flex items-center justify-center rounded-full border transition-colors duration-300"
         style={{ borderColor: "var(--cyan)", color: "var(--cyan)" }}
         whileHover={{ backgroundColor: "rgba(34,179,208,0.1)" }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="M9 18l6-6-6-6"/>
+          <path d="M9 18l6-6-6-6" />
         </svg>
       </motion.button>
 
       {/* Tombol Tutup */}
       <motion.button
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ delay: 0.1 }}
-        onClick={onClose}
-        aria-label="Tutup"
+        initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0 }} transition={{ delay: 0.1 }}
+        onClick={onClose} aria-label="Tutup"
         className="absolute top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full border transition-colors duration-300"
         style={{ borderColor: "var(--pink)", color: "var(--pink)" }}
         whileHover={{ backgroundColor: "rgba(207,83,155,0.12)" }}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="M18 6L6 18M6 6l12 12"/>
+          <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </motion.button>
 
       <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         transition={{ delay: 0.3 }}
         className="absolute bottom-5 text-xs tracking-[0.3em] uppercase"
         style={{ color: "var(--text-muted)" }}
@@ -352,30 +297,38 @@ function Lightbox({
 
 // ─── MasonryGrid ───────────────────────────────────────────────
 export default function MasonryGrid() {
-  const [active,      setActive]      = useState("all")
-  const [activeItem,  setActiveItem]  = useState<Item | null>(null)
-  const [activeIndex, setActiveIndex] = useState<number>(0)
+  const [active,       setActive]       = useState<Filter>("all")
+  const [activeItem,   setActiveItem]   = useState<Item | null>(null)
+  const [activeIndex,  setActiveIndex]  = useState(0)
+  const [lightboxList, setLightboxList] = useState<Item[]>(allPhotos)
 
-  const filtered = active === "all"
-    ? allPhotos
-    : allPhotos.filter(p => p.category === active)
+  // highlight: true selalu muncul pertama, sisanya urutan normal
+  const sorted = (list: Item[]): Item[] => [
+    ...list.filter(i => i.highlight),
+    ...list.filter(i => !i.highlight),
+  ]
 
-  const openItem = (item: Item, index: number) => {
+  const filtered: Item[] = sorted(
+    active === "all" ? allPhotos : allPhotos.filter(p => p.category === active)
+  )
+
+  const openItem = (item: Item, index: number, list: Item[] = filtered) => {
     setActiveItem(item)
     setActiveIndex(index)
+    setLightboxList(list)
   }
 
   const closeItem = () => setActiveItem(null)
 
   const goPrev = () => {
-    const i = (activeIndex - 1 + filtered.length) % filtered.length
-    setActiveItem(filtered[i])
+    const i = (activeIndex - 1 + lightboxList.length) % lightboxList.length
+    setActiveItem(lightboxList[i])
     setActiveIndex(i)
   }
 
   const goNext = () => {
-    const i = (activeIndex + 1) % filtered.length
-    setActiveItem(filtered[i])
+    const i = (activeIndex + 1) % lightboxList.length
+    setActiveItem(lightboxList[i])
     setActiveIndex(i)
   }
 
@@ -386,7 +339,11 @@ export default function MasonryGrid() {
       <div className="flex items-center justify-between mb-10 md:mb-14">
         <h2
           className="font-light tracking-wide"
-          style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.5rem)", color: "var(--gold)" }}
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(2rem, 4vw, 3.5rem)",
+            color: "var(--gold)",
+          }}
         >
           Works
         </h2>
@@ -413,7 +370,7 @@ export default function MasonryGrid() {
         </div>
       </div>
 
-      {/* Masonry */}
+      {/* Masonry — highlight otomatis di atas */}
       <motion.div layout style={{ columns: "3 280px", columnGap: "0.75rem" }}>
         <AnimatePresence>
           {filtered.map((item, index) => (
@@ -427,15 +384,21 @@ export default function MasonryGrid() {
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="break-inside-avoid mb-3 group relative overflow-hidden rounded-sm cursor-pointer"
               whileHover={{ y: -5 }}
-              onClick={() => openItem(item, index)}
+              onClick={() => openItem(item, index, filtered)}
             >
-              {item.category === "video" ? (
-                <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
+              {item.type === "video" ? (
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                >
                   <VideoCard src={item.src} />
                 </motion.div>
               ) : (
                 <>
-                  <motion.div whileHover={{ scale: 1.04 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
+                  <motion.div
+                    whileHover={{ scale: 1.04 }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  >
                     <Image
                       src={item.src}
                       alt={`Work ${item.id}`}
@@ -449,7 +412,9 @@ export default function MasonryGrid() {
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4"
                     style={{ background: "linear-gradient(to top, rgba(14,40,48,0.92) 0%, transparent 65%)" }}
                   >
-                    <span className="text-xs tracking-[0.3em] uppercase" style={{ color: "var(--pink)" }}>Photo</span>
+                    <span className="text-xs tracking-[0.3em] uppercase" style={{ color: "var(--pink)" }}>
+                      {item.category}
+                    </span>
                   </div>
                 </>
               )}
@@ -463,7 +428,7 @@ export default function MasonryGrid() {
         {activeItem && (
           <Lightbox
             item={activeItem}
-            items={filtered}
+            items={lightboxList}
             onClose={closeItem}
             onPrev={goPrev}
             onNext={goNext}
