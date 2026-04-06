@@ -18,7 +18,7 @@ type Photo = {
 
 const photoSets: Photo[][] = [
   [
-    { id: "a1", src: "https://picsum.photos/seed/ws1/400/560",  w: 400, h: 560, left: "3%",  top: "15%", size: "clamp(175px, 22vw, 358px)", depth: 1.2 },
+    { id: "a1", src: "/photo/tes.png",  w: 400, h: 560, left: "3%",  top: "15%", size: "clamp(175px, 22vw, 358px)", depth: 1.2 },
     { id: "a2", src: "https://picsum.photos/seed/ws2/500/320",  w: 500, h: 320, left: "18%", top: "13%", size: "clamp(200px, 26vw, 426px)", depth: 0.9 },
     { id: "a3", src: "https://picsum.photos/seed/ws3/380/500",  w: 380, h: 500, left: "60%", top: "13%", size: "clamp(163px, 21vw, 336px)", depth: 1.4 },
     { id: "a4", src: "https://picsum.photos/seed/ws4/460/300",  w: 460, h: 300, left: "76%", top: "18%", size: "clamp(188px, 25vw, 392px)", depth: 1.0 },
@@ -367,7 +367,7 @@ export default function FloatingGallery() {
               pointerEvents: "none",
             }}
           >
-            <DialWheel ref={dialRef} />
+            {/* <DialWheel ref={dialRef} /> */}
           </div>
 
           {/* Photo stage */}

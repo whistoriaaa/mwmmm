@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background:    #10313a;
+  --background:    #212028;
   --bg-surface:    #0e2830;
   --bg-surface-2:  #163540;
-  --bg-overlay:    rgba(14, 40, 48, 0.88);
+  --bg-overlay:    rgba(33, 32, 40);
 
   --cyan:  #22b3d0;
   --gold:  #d3b366;
