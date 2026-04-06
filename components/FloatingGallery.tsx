@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
 import { motion, AnimatePresence } from "motion/react"
 import ParticleField3D from "./ParticleField3D"
+import DialWheel from "./DialWheel"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -43,12 +44,12 @@ const photoSets: Photo[][] = [
 ]
 
 const floatParams = [
-  { y: 12, x: 5,  rot: 1.0, dur: 3.4, delay: 0.0 },
-  { y: 8,  x: 6,  rot: 0.6, dur: 2.9, delay: 0.5 },
-  { y: 13, x: 4,  rot: 1.2, dur: 3.8, delay: 0.2 },
-  { y: 9,  x: 6,  rot: 0.8, dur: 3.1, delay: 0.8 },
-  { y: 14, x: 7,  rot: 1.4, dur: 4.2, delay: 0.3 },
-  { y: 7,  x: 4,  rot: 0.6, dur: 2.7, delay: 0.6 },
+  { y: 30, x: 14, rot: 4.5, dur: 2.8, delay: 0.0 },
+  { y: 22, x: 18, rot: 5.2, dur: 2.4, delay: 0.5 },
+  { y: 34, x: 11, rot: 3.8, dur: 3.2, delay: 0.2 },
+  { y: 26, x: 16, rot: 6.0, dur: 2.6, delay: 0.8 },
+  { y: 38, x: 20, rot: 4.2, dur: 3.5, delay: 0.3 },
+  { y: 20, x: 9,  rot: 5.5, dur: 2.2, delay: 0.6 },
 ]
 
 // ─── Lightbox ──────────────────────────────────────────────────
@@ -69,7 +70,8 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
         onClick={e => e.stopPropagation()}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       >
-        <Image src={photo.src} alt={`Portfolio ${photo.id}`}
+        <Image
+          src={photo.src} alt={`Portfolio ${photo.id}`}
           width={photo.w} height={photo.h}
           className="w-full h-auto object-cover"
           style={{ maxHeight: "85vh", objectFit: "contain" }}
@@ -84,7 +86,7 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
         whileHover={{ backgroundColor: "rgba(207,83,155,0.12)" }}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="M18 6L6 18M6 6l12 12"/>
+          <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </motion.button>
       <motion.p
@@ -100,9 +102,6 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
 }
 
 // ─── PhotoCard ─────────────────────────────────────────────────
-// parallaxRef → outer div → dikontrol mouse parallax (x/y)
-// floatRef    → inner div → dikontrol floating idle (y/rotate)
-// Dua layer terpisah = tidak ada konflik properti GSAP
 function PhotoCard({
   photo, index,
   parallaxRefCb, floatRefCb,
@@ -121,27 +120,23 @@ function PhotoCard({
       if (!mobilePreview) {
         setMobilePreview(true)
         setTimeout(() => setMobilePreview(false), 3000)
-      } else { setMobilePreview(false); onOpen(photo) }
-    } else { onOpen(photo) }
+      } else {
+        setMobilePreview(false)
+        onOpen(photo)
+      }
+    } else {
+      onOpen(photo)
+    }
   }, [mobilePreview, onOpen, photo])
 
   return (
-    // Outer: posisi + mouse parallax
     <div
       ref={parallaxRefCb}
       className="absolute cursor-pointer group"
-      style={{
-        left: photo.left, top: photo.top, width: photo.size,
-        // GPU compositing — mencegah repaint saat transform
-        willChange: "transform",
-      }}
+      style={{ left: photo.left, top: photo.top, width: photo.size, willChange: "transform" }}
       onClick={handleClick}
     >
-      {/* Inner: floating idle — properti y/rotate terpisah dari outer */}
-      <div
-        ref={floatRefCb}
-        style={{ willChange: "transform" }}
-      >
+      <div ref={floatRefCb} style={{ willChange: "transform" }}>
         <motion.div
           layoutId={`photo-${photo.id}`}
           className="overflow-hidden rounded-sm shadow-2xl"
@@ -170,7 +165,7 @@ function PhotoCard({
               style={{ background: "rgba(8,18,22,0.65)", backdropFilter: "blur(2px)" }}
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
               </svg>
               <span className="text-xs tracking-widest uppercase" style={{ color: "var(--cyan)" }}>Tap lagi</span>
             </motion.div>
@@ -183,13 +178,14 @@ function PhotoCard({
 
 // ─── FloatingGallery ───────────────────────────────────────────
 export default function FloatingGallery() {
-  const sectionRef  = useRef<HTMLDivElement>(null)
-  const wrapperRef  = useRef<HTMLDivElement>(null)
-  const set1Ref     = useRef<HTMLDivElement>(null)
-  const set2Ref     = useRef<HTMLDivElement>(null)
-  const set3Ref     = useRef<HTMLDivElement>(null)
+  const sectionRef    = useRef<HTMLDivElement>(null)
+  const wrapperRef    = useRef<HTMLDivElement>(null)
+  const set1Ref       = useRef<HTMLDivElement>(null)
+  const set2Ref       = useRef<HTMLDivElement>(null)
+  const set3Ref       = useRef<HTMLDivElement>(null)
+  const dialRef       = useRef<HTMLDivElement>(null)      // SpinDisc → GSAP rotation
+  const dialWrapperRef = useRef<HTMLDivElement>(null)     // ← wrapper fade dial
 
-  // Dua array ref: outer (parallax) dan inner (float)
   const parallaxRefs = useRef<(HTMLDivElement | null)[]>([])
   const floatRefs    = useRef<(HTMLDivElement | null)[]>([])
 
@@ -197,11 +193,9 @@ export default function FloatingGallery() {
 
   useGSAP(() => {
 
-    // ── Floating idle: hanya menyentuh floatRef (inner) ──────
-    // floatRef mengontrol y + rotate saja → tidak bentrok dengan parallaxRef
+    // ── Floating idle ─────────────────────────────────────────
     const startFloating = (floatEl: HTMLDivElement, idx: number) => {
       const p = floatParams[idx % floatParams.length]
-
       gsap.to(floatEl, {
         y: `+=${p.y}`, duration: p.dur,
         repeat: -1, yoyo: true, ease: "sine.inOut", delay: p.delay,
@@ -226,7 +220,7 @@ export default function FloatingGallery() {
       })
     })
 
-    // ── Set 2 & 3: reset bersih, container di luar kanan ─────
+    // ── Reset Set 2 & 3 ──────────────────────────────────────
     gsap.set(set2Ref.current, { x: "110%", opacity: 0, force3D: true })
     gsap.set(set3Ref.current, { x: "110%", opacity: 0, force3D: true })
 
@@ -237,30 +231,58 @@ export default function FloatingGallery() {
       if (el) gsap.set(el, { y: 0, rotate: 0, force3D: true })
     })
 
-    // ── Scroll timeline ───────────────────────────────────────
+    // ── Shared ScrollTrigger config ───────────────────────────
+    const SCROLL_CONFIG = {
+      trigger: sectionRef.current,
+      start:   "top top",
+      end:     "+=250%",
+      scrub:   0.9,
+      invalidateOnRefresh: true,
+    } as const
+
+    // ── [DIAL] Rotation 0° → 240° ─────────────────────────────
+    gsap.to(dialRef.current, {
+      rotation: 240,
+      ease:     "none",
+      force3D:  true,
+      scrollTrigger: { ...SCROLL_CONFIG },
+    })
+
+    // ── Photo scroll timeline ─────────────────────────────────
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top top",
-        end: "+=250%",
-        pin: wrapperRef.current,
-        scrub: 0.9,          // lebih responsif dari 1.2
+        ...SCROLL_CONFIG,
+        pin:           wrapperRef.current,
         anticipatePin: 1,
-        fastScrollEnd: true, // ← langsung snap ke posisi akhir saat scroll cepat
+        fastScrollEnd: true,
       },
     })
 
-    tl.to(set1Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut", force3D: true })
+    tl
+      // Set 1 → Set 2 (timeline pos 0–1)
+      .to(set1Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut", force3D: true })
       .to(set2Ref.current, { x: "0%",    opacity: 1, duration: 1, ease: "power2.inOut", force3D: true }, "<")
+
+      // Set 2 → Set 3 (timeline pos 1.3–2.3)
       .to(set2Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut", force3D: true }, "+=0.3")
       .to(set3Ref.current, { x: "0%",    opacity: 1, duration: 1, ease: "power2.inOut", force3D: true }, "<")
 
-    // ── Set 2 floating: trigger saat container benar-benar masuk ─
+      // ── [DIAL] Fade out di akhir scroll (pos 1.9–2.3) ───────
+      // Saat Set 3 mulai masuk, dial mulai menghilang.
+      // Selesai hilang tepat saat scroll berakhir (sebelum MasonryGrid).
+      .to(dialWrapperRef.current, {
+        opacity:  0,
+        duration: 0.4,
+        ease:     "power2.in",
+        force3D:  true,
+      }, "1.9")
+
+    // ── Set 2 floating ────────────────────────────────────────
     ScrollTrigger.create({
       trigger: sectionRef.current,
-      start: "29% top",
-      end: "60% top",
-      once: true,
+      start:   "29% top",
+      end:     "60% top",
+      once:    true,
       onEnter: () => {
         floatRefs.current.slice(6, 12).forEach((el, i) => {
           if (el) startFloating(el, i)
@@ -271,8 +293,8 @@ export default function FloatingGallery() {
     // ── Set 3 floating ────────────────────────────────────────
     ScrollTrigger.create({
       trigger: sectionRef.current,
-      start: "63% top",
-      once: true,
+      start:   "63% top",
+      once:    true,
       onEnter: () => {
         floatRefs.current.slice(12, 18).forEach((el, i) => {
           if (el) startFloating(el, i)
@@ -281,12 +303,9 @@ export default function FloatingGallery() {
     })
 
     // ── Mouse parallax via RAF ────────────────────────────────
-    // RAF loop = 1 update per frame, tidak ada konflik dengan GSAP ticker
-    // Hanya menyentuh parallaxRef (outer) → floatRef (inner) aman
     let mouseX = 0, mouseY = 0
-    let rafId = 0
+    let rafId  = 0
 
-    // Lerp target per elemen
     const targets = parallaxRefs.current.map((_, i) => {
       const setIdx = Math.floor(i / 6)
       const depth  = photoSets[setIdx]?.[i % 6]?.depth ?? 1
@@ -303,7 +322,6 @@ export default function FloatingGallery() {
         if (!el) return
         const t = targets[i]
         if (!t) return
-        // Lerp menuju target → smooth tanpa GSAP tween
         t.cx += (mouseX * t.depth - t.cx) * 0.06
         t.cy += (mouseY * t.depth - t.cy) * 0.06
         gsap.set(el, { x: t.cx, y: t.cy, force3D: true })
@@ -321,7 +339,7 @@ export default function FloatingGallery() {
 
   }, { scope: sectionRef })
 
-  // ── Render helper ──────────────────────────────────────────
+  // ── Render helper ─────────────────────────────────────────
   const renderSet = (
     setPhotos: Photo[],
     containerRef: React.RefObject<HTMLDivElement | null>,
@@ -344,20 +362,40 @@ export default function FloatingGallery() {
   return (
     <>
       <div ref={sectionRef} style={{ height: "350vh" }}>
-        <div ref={wrapperRef} className="relative w-full h-screen overflow-hidden">
-          <ParticleField3D />
+        <div ref={wrapperRef} className="relative w-full h-screen">
 
-          {renderSet(photoSets[0], set1Ref, 0)}
-          {renderSet(photoSets[1], set2Ref, 6)}
-          {renderSet(photoSets[2], set3Ref, 12)}
+          {/* ── DialWheel wrapper — target opacity fade ──────────
+              div ini dikendalikan GSAP untuk fade out.
+              Terpisah dari dialRef (target rotation SpinDisc).
+          ─────────────────────────────────────────────────── */}
+          <div
+            ref={dialWrapperRef}
+            style={{
+              position:      "absolute",
+              inset:         0,
+              zIndex:        3,
+              pointerEvents: "none",
+            }}
+          >
+            <DialWheel ref={dialRef} />
+          </div>
 
+          {/* ── Photo stage: overflow-hidden hanya di sini ───── */}
+          <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 5 }}>
+            <ParticleField3D />
+            {renderSet(photoSets[0], set1Ref, 0)}
+            {renderSet(photoSets[1], set2Ref, 6)}
+            {renderSet(photoSets[2], set3Ref, 12)}
+          </div>
+
+          {/* ── Center title ──────────────────────────────────── */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
             <h1
               className="font-light italic tracking-wider leading-none"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(4rem, 10vw, 10rem)",
-                color: "var(--gold)",
+                fontSize:   "clamp(4rem, 10vw, 10rem)",
+                color:      "var(--gold)",
                 textShadow: "0 0 120px rgba(211,179,102,0.2), 0 0 40px rgba(16,49,58,0.8)",
               }}
             >
@@ -370,15 +408,24 @@ export default function FloatingGallery() {
               Photographer &amp; Videographer
             </p>
             <div className="absolute bottom-8 flex flex-col items-center gap-2">
-              <span className="text-xs tracking-[0.35em] uppercase" style={{ color: "var(--cyan)", opacity: 0.4 }}>Scroll</span>
+              <span
+                className="text-xs tracking-[0.35em] uppercase"
+                style={{ color: "var(--cyan)", opacity: 0.4 }}
+              >
+                Scroll
+              </span>
               <motion.div
                 animate={{ y: [0, 6, 0] }}
                 transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
                 className="w-px h-10"
-                style={{ background: "linear-gradient(to bottom, var(--cyan), transparent)", opacity: 0.4 }}
+                style={{
+                  background: "linear-gradient(to bottom, var(--cyan), transparent)",
+                  opacity: 0.4,
+                }}
               />
             </div>
           </div>
+
         </div>
       </div>
 
