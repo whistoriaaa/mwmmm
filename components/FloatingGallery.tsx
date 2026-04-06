@@ -178,13 +178,13 @@ function PhotoCard({
 
 // ─── FloatingGallery ───────────────────────────────────────────
 export default function FloatingGallery() {
-  const sectionRef    = useRef<HTMLDivElement>(null)
-  const wrapperRef    = useRef<HTMLDivElement>(null)
-  const set1Ref       = useRef<HTMLDivElement>(null)
-  const set2Ref       = useRef<HTMLDivElement>(null)
-  const set3Ref       = useRef<HTMLDivElement>(null)
-  const dialRef       = useRef<HTMLDivElement>(null)      // SpinDisc → GSAP rotation
-  const dialWrapperRef = useRef<HTMLDivElement>(null)     // ← wrapper fade dial
+  const sectionRef     = useRef<HTMLDivElement>(null)
+  const wrapperRef     = useRef<HTMLDivElement>(null)
+  const set1Ref        = useRef<HTMLDivElement>(null)
+  const set2Ref        = useRef<HTMLDivElement>(null)
+  const set3Ref        = useRef<HTMLDivElement>(null)
+  const dialRef        = useRef<HTMLDivElement>(null)
+  const dialWrapperRef = useRef<HTMLDivElement>(null)
 
   const parallaxRefs = useRef<(HTMLDivElement | null)[]>([])
   const floatRefs    = useRef<(HTMLDivElement | null)[]>([])
@@ -240,7 +240,7 @@ export default function FloatingGallery() {
       invalidateOnRefresh: true,
     } as const
 
-    // ── [DIAL] Rotation 0° → 240° ─────────────────────────────
+    // ── Dial rotation 0° → 240° ───────────────────────────────
     gsap.to(dialRef.current, {
       rotation: 240,
       ease:     "none",
@@ -259,17 +259,10 @@ export default function FloatingGallery() {
     })
 
     tl
-      // Set 1 → Set 2 (timeline pos 0–1)
       .to(set1Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut", force3D: true })
       .to(set2Ref.current, { x: "0%",    opacity: 1, duration: 1, ease: "power2.inOut", force3D: true }, "<")
-
-      // Set 2 → Set 3 (timeline pos 1.3–2.3)
       .to(set2Ref.current, { x: "-110%", opacity: 0, duration: 1, ease: "power2.inOut", force3D: true }, "+=0.3")
       .to(set3Ref.current, { x: "0%",    opacity: 1, duration: 1, ease: "power2.inOut", force3D: true }, "<")
-
-      // ── [DIAL] Fade out di akhir scroll (pos 1.9–2.3) ───────
-      // Saat Set 3 mulai masuk, dial mulai menghilang.
-      // Selesai hilang tepat saat scroll berakhir (sebelum MasonryGrid).
       .to(dialWrapperRef.current, {
         opacity:  0,
         duration: 0.4,
@@ -364,10 +357,7 @@ export default function FloatingGallery() {
       <div ref={sectionRef} style={{ height: "350vh" }}>
         <div ref={wrapperRef} className="relative w-full h-screen">
 
-          {/* ── DialWheel wrapper — target opacity fade ──────────
-              div ini dikendalikan GSAP untuk fade out.
-              Terpisah dari dialRef (target rotation SpinDisc).
-          ─────────────────────────────────────────────────── */}
+          {/* Dial wrapper — GSAP fade target */}
           <div
             ref={dialWrapperRef}
             style={{
@@ -380,7 +370,7 @@ export default function FloatingGallery() {
             <DialWheel ref={dialRef} />
           </div>
 
-          {/* ── Photo stage: overflow-hidden hanya di sini ───── */}
+          {/* Photo stage */}
           <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 5 }}>
             <ParticleField3D />
             {renderSet(photoSets[0], set1Ref, 0)}
@@ -388,7 +378,7 @@ export default function FloatingGallery() {
             {renderSet(photoSets[2], set3Ref, 12)}
           </div>
 
-          {/* ── Center title ──────────────────────────────────── */}
+          {/* Center title */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
             <h1
               className="font-light italic tracking-wider leading-none"
