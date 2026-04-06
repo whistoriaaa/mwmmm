@@ -456,7 +456,6 @@ export default function AboutPage() {
         height="65vh"
         speed={0.25}
         overlayOpacity={0.3}
-        style={{ filter: "brightness(0.2) saturate(0.5)" }} priority
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
