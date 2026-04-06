@@ -293,7 +293,7 @@ export default function AboutPage() {
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <motion.div style={{ y: heroBgY, scale: heroScale }} className="absolute inset-0 z-0">
           <Image
-            src="https://picsum.photos/seed/about-hero/1600/900"
+            src="/photo/photo (9).jpg"
             alt="About hero" fill className="object-cover"
             style={{ filter: "brightness(0.2) saturate(0.5)" }} priority
           />
@@ -451,11 +451,12 @@ export default function AboutPage() {
 
       {/* ── FOTO PARALLAX 2 ──────────────────────────────────── */}
       <ParallaxPhoto
-        src="https://picsum.photos/seed/about-landscape/1600/900"
+        src="/photo/photo (12).jpg"
         alt="Shobiryne - Landscape"
         height="65vh"
         speed={0.25}
         overlayOpacity={0.3}
+        style={{ filter: "brightness(0.2) saturate(0.5)" }} priority
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -528,7 +529,7 @@ export default function AboutPage() {
       <section className="px-6 md:px-16 py-28 md:py-40 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <Image
-            src="https://picsum.photos/seed/about-cta/1400/700"
+            src="/photo/photo (3).jpg"
             alt="" fill className="object-cover"
             style={{ filter: "brightness(0.08) saturate(0.4)" }}
           />
