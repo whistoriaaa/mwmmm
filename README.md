@@ -6,7 +6,6 @@
 
 ## ✨ Features
 
-- **Fujifilm Dial 3D** — A large machined-aluminum-style dial rendered in pure CSS + GSAP that rotates as you scroll, mimicking the physical dial of a Fujifilm camera
 - **Floating Gallery** — Photo sets with idle float animation, mouse parallax, and smooth set transitions on scroll
 - **Lightbox with Swipe** — Full-screen lightbox supporting touch swipe gesture and keyboard navigation
 - **Particle Field** — Subtle ambient particle background for depth
