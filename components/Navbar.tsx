@@ -145,7 +145,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen]       = useState(false)
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setPastGallery(latest > window.innerHeight * 3.3)
+    setPastGallery(latest > window.innerHeight * 0.88)
   })
 
   useEffect(() => {

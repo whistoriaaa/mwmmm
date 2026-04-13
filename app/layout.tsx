@@ -1,21 +1,22 @@
 import type { Metadata, Viewport } from "next"
-import { Cormorant_Garamond, DM_Sans } from "next/font/google"
+import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/Navbar"
 
 const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400", "600"],
-  style: ["normal", "italic"],
+  subsets:  ["latin"],
+  weight:   ["300", "400", "600"],
+  style:    ["normal", "italic"],
   variable: "--font-display",
-  display: "swap",
+  display:  "swap",
 })
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+const jakarta = Plus_Jakarta_Sans({
+  subsets:  ["latin"],
+  weight:   ["300", "400", "500", "600", "700"],
+  style:    ["normal", "italic"],
   variable: "--font-body",
-  display: "swap",
+  display:  "swap",
 })
 
 export const metadata: Metadata = {
@@ -45,7 +46,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

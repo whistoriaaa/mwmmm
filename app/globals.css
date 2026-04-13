@@ -35,7 +35,7 @@ html {
 body {
   background-color: var(--background);
   color: var(--text-primary);
-  font-family: var(--font-body);
+  font-family: var(--font-body), "Plus Jakarta Sans", sans-serif;
   min-height: 100dvh;
   line-height: 1.6;
 }
