@@ -8,10 +8,6 @@ export default function PortofolioPage() {
 
       <div
         className="w-full h-px max-w-5xl mx-auto my-0"
-        style={{
-          background: "linear-gradient(to right, transparent, var(--cyan), transparent)",
-          opacity: 0.25
-        }}
       />
 
       <MasonryGrid />

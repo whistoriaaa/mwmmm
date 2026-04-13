@@ -12,7 +12,7 @@ const contactLinks = [
   {
     label: "Instagram",
     value: "@shobiryne",
-    href: "https://instagram.com/shobiryne",
+    href: "https://instagram.com/shobiryne_",
     desc: "Follow for daily updates",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -27,8 +27,8 @@ const contactLinks = [
   },
   {
     label: "WhatsApp",
-    value: "+62 xxx-xxxx-xxxx",
-    href: "https://wa.me/62xxxxxxxxxx",
+    value: "+62822-4553-4636",
+    href: "https://wa.me/6282245534636",
     desc: "Chat langsung untuk diskusi",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -41,8 +41,8 @@ const contactLinks = [
   },
   {
     label: "Email",
-    value: "hello@shobiryne.com",
-    href: "mailto:hello@shobiryne.com",
+    value: "shobiryne@gmail.com",
+    href: "mailto:shobiryne@gmail.com",
     desc: "Untuk inquiry & kolaborasi",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

@@ -1,194 +1,229 @@
 "use client"
 
-import { forwardRef, useState, useEffect } from "react"
+import { forwardRef, useRef, useEffect, useState } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 
-// ── 72 tick marks on face (every 5°) ──────────────────────────────────────
-const TICKS = Array.from({ length: 72 }, (_, i) => {
-  const a  = (i * 5 * Math.PI) / 180
-  const s  = Math.sin(a), c = Math.cos(a)
-  const mj = i % 6 === 0
-  const md = !mj && i % 3 === 0
-  const ro = 48.7
-  const ri = mj ? 41.0 : md ? 44.5 : 46.5
+gsap.registerPlugin(ScrollTrigger)
+
+// ── 17 label tersebar merata 360° ──────────────────────────────
+const BASE_LABELS = [
+  { v: "A",    isA: true  },
+  { v: "T",    isA: false },
+  { v: "B",    isA: false },
+  { v: "1",    isA: false },
+  { v: "2",    isA: false },
+  { v: "4",    isA: false },
+  { v: "8",    isA: false },
+  { v: "15",   isA: false },
+  { v: "30",   isA: false },
+  { v: "60",   isA: false },
+  { v: "125",  isA: false },
+  { v: "250X",  isA: false },
+  { v: "500",  isA: false },
+  { v: "1000", isA: false },
+  { v: "2000", isA: false },
+  { v: "4000", isA: false },
+  { v: "8000", isA: false },
+]
+
+const STEP = 360 / BASE_LABELS.length  // ≈ 21.18° per item
+
+const SPEEDS = BASE_LABELS.map((s, i) => ({
+  ...s,
+  a: +(i * STEP).toFixed(2),
+}))
+
+// ── Tick marks: 17 titik merata 360° ───────────────────────────
+const TICKS = BASE_LABELS.map((_, i) => {
+  const a = (i * STEP * Math.PI) / 180
   return {
-    x1: Number((50 + ri * s).toFixed(4)), y1: Number((50 - ri * c).toFixed(4)),
-    x2: Number((50 + ro * s).toFixed(4)), y2: Number((50 - ro * c).toFixed(4)),
-    mj, md,
+    x1: +(50 + 44.0 * Math.sin(a)).toFixed(3),
+    y1: +(50 - 44.0 * Math.cos(a)).toFixed(3),
+    x2: +(50 + 47.5 * Math.sin(a)).toFixed(3),
+    y2: +(50 - 47.5 * Math.cos(a)).toFixed(3),
   }
 })
 
-// ── Shutter-speed labels ───────────────────────────────────────────────────
-const SPEEDS = [
-  { v: "A",    a: -115 }, { v: "B",    a:  -95 }, { v: "T",    a:  -76 },
-  { v: "1",    a:  -58 }, { v: "2",    a:  -41 }, { v: "4",    a:  -25 },
-  { v: "8",    a:   -9 }, { v: "15",   a:    0 }, { v: "30",   a:    9 },
-  { v: "60",   a:   25 }, { v: "125",  a:   41 }, { v: "250",  a:   58 },
-  { v: "500",  a:   76 }, { v: "1000", a:   95 }, { v: "2000", a:  115 },
-].map(s => {
-  const r = (s.a * Math.PI) / 180
+// ── Knurling ────────────────────────────────────────────────────
+const KNURLS = Array.from({ length: 90 }, (_, i) => {
+  const a = (i * (360 / 90) * Math.PI) / 180
   return {
-    ...s,
-    x: Number((50 + 36 * Math.sin(r)).toFixed(4)),
-    y: Number((50 - 36 * Math.cos(r)).toFixed(4)),
+    x1: +(50 + 46.5 * Math.sin(a)).toFixed(3), y1: +(50 - 46.5 * Math.cos(a)).toFixed(3),
+    x2: +(50 + 49.5 * Math.sin(a)).toFixed(3), y2: +(50 - 49.5 * Math.cos(a)).toFixed(3),
+    bright: i % 2 === 0,
   }
 })
 
-// ── Component ──────────────────────────────────────────────────────────────
+// Teks mulai dari pinggir luar, mengalir ke dalam
+const OUTER_R = 46
+const OUTER_Y = 50 - OUTER_R  // = 8
+
+// ── Component ──────────────────────────────────────────────────
 const DialWheel = forwardRef<HTMLDivElement>((_, ref) => {
-  // ── Responsive diameter ───────────────────────────────────────────────
-  const [D, setD] = useState(80)
+  const discRef = useRef<HTMLDivElement>(null)
+  const [mobile, setMobile] = useState(false)
 
   useEffect(() => {
-    const update = () => {
-      if (window.innerWidth < 480)      setD(118)
-      else if (window.innerWidth < 768) setD(110)
-      else                              setD(80)
-    }
-    update()
-    window.addEventListener("resize", update)
-    return () => window.removeEventListener("resize", update)
+    const check = () => setMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
   }, [])
 
-  const HR       = D / 2
-  const isMobile = D >= 120
+  // ── GSAP scroll spin ─────────────────────────────────────────
+  useEffect(() => {
+    const disc = discRef.current
+    if (!disc) return
+    const ctx = gsap.context(() => {
+      gsap.to(disc, {
+        rotation: 360,
+        ease: "none",
+        scrollTrigger: {
+          trigger: document.documentElement,
+          start:   "top top",
+          end:     "bottom bottom",
+          scrub:   1.4,
+        },
+      })
+    }, disc)
+    return () => ctx.revert()
+  }, [])
+
+  const FS = mobile ? "5.5" : "9.4"
 
   return (
-    <>
+    <div
+      ref={ref}
+      style={{
+        position:      "absolute",
+        top:           "100%",
+        left:          "10%",
+        transform:     "translate(-50%, -50%)",
+        width:  "clamp(280px, 60vw, 700px)",
+        height: "clamp(280px, 60vw, 700px)",
+        zIndex:        3,
+        pointerEvents: "none",
+        userSelect:    "none",
+      }}
+    >
+      {/* ── Spinning disc ── */}
       <div
-        aria-hidden="true"
+        ref={discRef}
         style={{
-          position:          "absolute",
-          bottom:            `-${HR * 0.56}vw`,
-          left:              "50%",
-          transform:         "translateX(-50%)",
-          width:             `${D}vw`,
-          height:            `${D * 0.5}vw`,
-          zIndex:            3,
-          pointerEvents:     "none",
-          userSelect:        "none",
-          perspective:       `clamp(600px, ${isMobile ? 90 : 130}vw, 2200px)`,
-          perspectiveOrigin: "50% 18%",
-          overflow:          "hidden",
+          width:        "100%",
+          height:       "100%",
+          willChange:   "transform",
+          borderRadius: "50%",
+          background:   "#111",
+          boxShadow: [
+            "0 0 0 1px rgba(255,255,255,0.75)",
+            "0 0 0 2.5px rgba(60,58,55,0.50)",
+            "0 0 0 4px #050505",
+            "0 20px 70px rgba(0,0,0,0.90)",
+            "0 6px 20px  rgba(0,0,0,0.70)",
+          ].join(", "),
         }}
       >
-        {/* Tilt wrapper */}
-        <div
-          style={{
-            width:           "100%",
-            height:          "100%",
-            transform:       `rotateX(${isMobile ? 52 : 68}deg)`,
-            transformStyle:  "preserve-3d",
-            transformOrigin: "50% 100%",
-          }}
+        <svg
+          viewBox="0 0 100 100"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          aria-hidden="true"
         >
-          {/* SpinDisc — GSAP rotateZ target */}
-          <div
-            ref={ref}
-            style={{
-              position:       "absolute",
-              bottom:         0,
-              left:           `calc(50% - ${HR}vw)`,
-              width:          `${D}vw`,
-              height:         `${D}vw`,
-              transformStyle: "preserve-3d",
-              willChange:     "transform",
-            }}
-          >
-            {/* ══ DISC FACE ══════════════════════════════════════════ */}
-            <div style={{
-              position:     "absolute",
-              inset:        0,
-              borderRadius: "50%",
-              background: [
-                "radial-gradient(ellipse at 32% 26%, rgba(255,255,255,0.055) 0%, transparent 50%)",
-                "radial-gradient(circle, #242424 0%, #1b1b1b 28%, #141414 62%, #0e0e0e 100%)",
-              ].join(", "),
-              boxShadow: [
-                `0 0 0 ${D * 0.004}vw rgba(220,220,220,0.25)`,
-                `0 0 0 ${D * 0.009}vw rgba(0,0,0,0.98)`,
-                `0 0 0 ${D * 0.014}vw rgba(160,160,160,0.10)`,
-                `0 0 0 ${D * 0.018}vw rgba(0,0,0,0.70)`,
-              ].join(", "),
-            }}>
-              <svg
-                viewBox="0 0 100 100"
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-                aria-hidden="true"
-              >
-                <defs>
-                  <radialGradient id="dlFaceHL" cx="32%" cy="26%" r="50%">
-                    <stop offset="0%"   stopColor="rgba(255,255,255,0.06)" />
-                    <stop offset="100%" stopColor="transparent" />
-                  </radialGradient>
-                  <radialGradient id="dlHubGr" cx="38%" cy="32%" r="62%">
-                    <stop offset="0%"   stopColor="#303030" />
-                    <stop offset="100%" stopColor="#0f0f0f" />
-                  </radialGradient>
-                </defs>
+          <defs>
+            <radialGradient id="dw_face" cx="50%" cy="44%" r="65%">
+              <stop offset="0%"   stopColor="#2a2a2a" />
+              <stop offset="50%"  stopColor="#1e1e1e" />
+              <stop offset="100%" stopColor="#0f0f0f" />
+            </radialGradient>
 
-                {/* Highlight */}
-                <circle cx="50" cy="50" r="49" fill="url(#dlFaceHL)" />
+            <radialGradient id="dw_vig" cx="50%" cy="50%" r="50%">
+              <stop offset="62%"  stopColor="transparent" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0.60)" />
+            </radialGradient>
 
-                {/* Outer bevel rings */}
-                <circle cx="50" cy="50" r="49.3" fill="none" stroke="rgba(200,200,200,0.30)" strokeWidth="0.28" />
-                <circle cx="50" cy="50" r="48.7" fill="none" stroke="rgba(0,0,0,0.90)"       strokeWidth="0.22" />
-                <circle cx="50" cy="50" r="48.2" fill="none" stroke="rgba(200,200,200,0.08)" strokeWidth="0.16" />
+            <linearGradient id="dw_chrome" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stopColor="rgba(255,255,255,0.82)" />
+              <stop offset="28%"  stopColor="rgba(255,255,255,0.14)" />
+              <stop offset="58%"  stopColor="rgba(255,255,255,0.52)" />
+              <stop offset="100%" stopColor="rgba(140,138,134,0.08)" />
+            </linearGradient>
 
-                {/* Tick marks */}
-                {TICKS.map((t, i) => (
-                  <line key={i}
-                    x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2}
-                    stroke={
-                      t.mj ? "rgba(225,225,225,0.95)"
-                           : t.md ? "rgba(155,155,155,0.60)"
-                                  : "rgba(95,95,95,0.42)"
-                    }
-                    strokeWidth={t.mj ? "0.72" : t.md ? "0.44" : "0.26"}
-                    strokeLinecap="round"
-                  />
-                ))}
+            <radialGradient id="dw_hub" cx="32%" cy="26%" r="68%">
+              <stop offset="0%"   stopColor="#303030" />
+              <stop offset="50%"  stopColor="#141414" />
+              <stop offset="100%" stopColor="#040404" />
+            </radialGradient>
+          </defs>
 
-                {/* Label ring separator */}
-                <circle cx="50" cy="50" r="40.8" fill="none" stroke="rgba(180,180,180,0.22)" strokeWidth="0.17" />
+          {/* ─ Face ─ */}
+          <circle cx="50" cy="50" r="49.8" fill="url(#dw_face)" />
+          <circle cx="50" cy="50" r="49.8" fill="url(#dw_vig)" />
 
-                {/* Shutter-speed labels — font lebih besar di mobile */}
-                {SPEEDS.map(s => (
-                  <text
-                    key={`sp-${s.v}-${s.a}`}
-                    x={s.x} y={s.y}
-                    textAnchor="middle" dominantBaseline="central"
-                    fill={
-                      s.a === 0     ? "#c0392b"
-                      : s.v === "A" ? "rgba(220,220,220,0.92)"
-                      : "rgba(175,175,175,0.75)"
-                    }
-                    fontSize={
-                      isMobile
-                        ? (s.v.length > 2 ? "2.6"  : "3.1")
-                        : (s.v.length > 2 ? "2.1"  : "2.55")
-                    }
-                    fontFamily="'Inter','Helvetica Neue',Arial,sans-serif"
-                    fontWeight={s.a === 0 ? "700" : s.v === "A" ? "600" : "400"}
-                  >
-                    {s.v}
-                  </text>
-                ))}
+          {/* ─ Knurling band ─ */}
+          {/* <circle cx="50" cy="50" r="49.8" fill="none" stroke="#0a0a0a" strokeWidth="5.8" />
+          {KNURLS.map((k, i) => (
+            <line key={i}
+              x1={k.x1} y1={k.y1} x2={k.x2} y2={k.y2}
+              stroke={k.bright ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.72)"}
+              strokeWidth="0.45"
+            />
+          ))} */}
 
-                {/* Inner ring */}
-                <circle cx="50" cy="50" r="21.5" fill="none" stroke="rgba(170,170,170,0.18)" strokeWidth="0.17" />
+          {/* ─ Chrome edge lancip ─ */}
+          {/* <circle cx="50" cy="50" r="46.4" fill="none" stroke="url(#dw_chrome)" strokeWidth="0.42" />
+          <circle cx="50" cy="50" r="46.0" fill="none" stroke="rgba(0,0,0,0.92)"  strokeWidth="0.22" /> */}
 
-                {/* Hub */}
-                <circle cx="50" cy="50" r="13.5" fill="url(#dlHubGr)"    stroke="rgba(180,180,180,0.38)" strokeWidth="0.28" />
-                <circle cx="50" cy="50" r="8.2"  fill="none"             stroke="rgba(80,80,80,0.50)"    strokeWidth="0.18" />
-                <circle cx="50" cy="50" r="3.6"  fill="#1c1c1c"          stroke="rgba(175,175,175,0.52)" strokeWidth="0.30" />
-                <circle cx="50" cy="50" r="1.3"  fill="rgba(200,200,200,0.72)" />
-              </svg>
-            </div>
+          {/* ─ Tick marks ─ */}
+          {/* {TICKS.map((t, i) => (
+            <line key={i}
+              x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2}
+              stroke="rgba(230,228,224,0.88)"
+              strokeWidth="0.9"
+              strokeLinecap="round"
+            />
+          ))} */}
 
-          </div>{/* /SpinDisc */}
-        </div>{/* /TiltWrapper */}
-      </div>{/* /PerspectiveContainer */}
-    </>
+          {/* ─ Labels — radial dari luar ke dalam ─
+               x={50} y={OUTER_Y}               → anchor di posisi atas (radius OUTER_R)
+               textAnchor="start"                → karakter pertama di anchor = pinggir luar
+               rotate(a, 50,50) rotate(90,50,8)  → posisikan + putar teks mengalir ke dalam
+          */}
+          {SPEEDS.map(s => (
+            <text
+              key={`sp-${s.v}`}
+              x={50}
+              y={OUTER_Y}
+              textAnchor="start"
+              dominantBaseline="central"
+              transform={`rotate(${s.a}, 50, 50) rotate(90, 50, ${OUTER_Y})`}
+              fill={s.isA ? "#ff3800" : "rgba(230,228,224,0.95)"}
+              fontSize={FS}
+              fontFamily="'Inter','Helvetica Neue',Arial,sans-serif"
+              fontWeight={s.isA ? "900" : "700"}
+              letterSpacing="0.1"
+            >
+              {s.v}
+            </text>
+          ))}
+
+          {/* ─ Inner groove ─ */}
+          <circle cx="50" cy="50" r="21.5" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="0.20" />
+          <circle cx="50" cy="50" r="21.0" fill="none" stroke="rgba(0,0,0,0.72)"       strokeWidth="0.15" />
+
+          {/* ─ Hub ─ */}
+          <circle cx="50" cy="50" r="14.5" fill="url(#dw_hub)" />
+          <circle cx="50" cy="50" r="14.5" fill="none" stroke="url(#dw_chrome)"          strokeWidth="0.38" />
+          <circle cx="50" cy="50" r="7.0"  fill="#090909" stroke="rgba(255,255,255,0.14)" strokeWidth="0.28" />
+          <circle cx="50" cy="50" r="4.2"  fill="#131313" stroke="rgba(255,255,255,0.08)" strokeWidth="0.20" />
+          <circle cx="50" cy="50" r="1.4"  fill="rgba(130,128,124,0.55)" />
+
+          {/* ─ Indicator notch ─ */}
+          <rect x="49.1" y="43.8" width="1.8" height="3.2" rx="0.4"
+            fill="rgba(240,238,234,0.95)" />
+        </svg>
+      </div>
+    </div>
   )
 })
 
