@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html,
+body {
+  position: relative;
+}
+
 :root {
   --background:    #212028;
   --bg-surface:    #0e2830;

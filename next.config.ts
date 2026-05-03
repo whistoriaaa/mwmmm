@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
         hostname: "picsum.photos",
       }
     ],
-    qualities: [75, 85],
+    qualities: [65, 75, 80, 85],
   },
   reactCompiler: true,
 };
