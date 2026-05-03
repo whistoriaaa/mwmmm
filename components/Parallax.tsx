@@ -1,12 +1,13 @@
 "use client"
 
-import React, { useRef, useEffect, useLayoutEffect, useState } from "react"
+import React, { useRef, useEffect, useState } from "react"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "motion/react"
 
 const MAX_ZOOM_DESKTOP = 3.5
 const MAX_ZOOM_MOBILE  = 2.2
 
+// Grain: SVG di-encode jadi data URL statis — tidak ada SVG runtime di DOM
 const GRAIN_STYLE: React.CSSProperties = {
   position: "absolute",
   inset: 0,
@@ -17,6 +18,7 @@ const GRAIN_STYLE: React.CSSProperties = {
   backgroundRepeat: "repeat",
   backgroundSize: "200px 200px",
   mixBlendMode: "overlay",
+  willChange: "auto",
 }
 
 const TECH_TOP    = ["f/1.8", "ISO 400", "1/500s", "35mm", "RAW", "f/2.8", "ISO 200", "1/250s"]
@@ -27,6 +29,7 @@ const TECH_RIGHT  = ["JPEG", "f/1.4", "ISO 800", "1/125s", "50mm", "RAW", "EV -0
 const handFont = "'Dancing Script', 'Segoe Script', cursive"
 const monoFont = "'Courier New', Courier, monospace"
 
+// React.memo — frame tidak re-render saat scroll
 const PolaroidFrame = React.memo(function PolaroidFrame({ mobile }: { mobile: boolean }) {
   const bt = mobile ? 38 : 72
   const bs = mobile ? 38 : 72
@@ -38,6 +41,7 @@ const PolaroidFrame = React.memo(function PolaroidFrame({ mobile }: { mobile: bo
 
   return (
     <>
+      {/* TOP */}
       <div className="absolute left-0 right-0 flex items-center justify-around overflow-hidden"
         style={{ top: 0, height: bt, background: `linear-gradient(to bottom, ${cream}, ${creamDk})`, zIndex: 20, paddingLeft: bs, paddingRight: bs }}>
         {TECH_TOP.map((t, i) => (
@@ -45,6 +49,7 @@ const PolaroidFrame = React.memo(function PolaroidFrame({ mobile }: { mobile: bo
         ))}
       </div>
 
+      {/* BOTTOM */}
       <div className="absolute left-0 right-0 flex flex-col items-center justify-center"
         style={{ bottom: 0, height: bb, background: `linear-gradient(to top, ${creamDk}, ${cream})`, zIndex: 20, gap: mobile ? 5 : 10 }}>
         <div className="flex items-center justify-around w-full" style={{ paddingLeft: bs, paddingRight: bs }}>
@@ -57,6 +62,7 @@ const PolaroidFrame = React.memo(function PolaroidFrame({ mobile }: { mobile: bo
         <span style={{ fontFamily: handFont, fontWeight: 600, fontSize: mobile ? 10 : 18, color: "#1a6b3a", letterSpacing: "0.12em", opacity: 0.80, lineHeight: 1 }}>Fujifilm</span>
       </div>
 
+      {/* LEFT */}
       <div className="absolute flex flex-col justify-around items-center overflow-hidden"
         style={{ top: 0, bottom: 0, left: 0, width: bs, background: `linear-gradient(to right, ${creamDk}, ${cream})`, zIndex: 20, paddingTop: bt, paddingBottom: bb }}>
         {TECH_LEFT.slice(0, mobile ? 8 : 12).map((t, i) => (
@@ -64,6 +70,7 @@ const PolaroidFrame = React.memo(function PolaroidFrame({ mobile }: { mobile: bo
         ))}
       </div>
 
+      {/* RIGHT */}
       <div className="absolute flex flex-col justify-around items-center overflow-hidden"
         style={{ top: 0, bottom: 0, right: 0, width: bs, background: `linear-gradient(to left, ${creamDk}, ${cream})`, zIndex: 20, paddingTop: bt, paddingBottom: bb }}>
         {TECH_RIGHT.slice(0, mobile ? 8 : 12).map((t, i) => (
@@ -71,10 +78,12 @@ const PolaroidFrame = React.memo(function PolaroidFrame({ mobile }: { mobile: bo
         ))}
       </div>
 
+      {/* Outer border */}
       <div className="absolute inset-0 pointer-events-none"
-        style={{ zIndex: 25, border: `${mobile ? 2 : 3}px solid rgba(255,255,255,0.35)`,
+        style={{ zIndex: 25, borderRadius: 0, border: `${mobile ? 2 : 3}px solid rgba(255,255,255,0.35)`,
           boxShadow: `0 ${mobile ? 12 : 32}px ${mobile ? 45 : 110}px rgba(0,0,0,0.70), 0 ${mobile ? 4 : 10}px ${mobile ? 14 : 35}px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.22)` }} />
 
+      {/* Light leak */}
       <div className="absolute left-0 right-0 pointer-events-none"
         style={{ top: bt, height: mobile ? 45 : 100, zIndex: 19, background: "linear-gradient(to bottom, rgba(255,238,180,0.11) 0%, transparent 100%)", mixBlendMode: "screen" }} />
     </>
@@ -94,12 +103,9 @@ export default function PolaroidParallax() {
     return () => window.removeEventListener("resize", check)
   }, [])
 
-  // ─── Gunakan scroll dari window, bukan dari target container ───
-  // Ini eliminasi warning "non-static position" sepenuhnya
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
-    layoutEffect: false,   // ← pakai useEffect bukan useLayoutEffect = tidak SSR warning
   })
 
   const maxZoom    = mobile ? MAX_ZOOM_MOBILE : MAX_ZOOM_DESKTOP
@@ -110,22 +116,27 @@ export default function PolaroidParallax() {
   return (
     <div
       ref={containerRef}
-      className="w-full overflow-hidden"
+      className="relative w-full overflow-hidden"
       style={{
-        position: "relative",   // inline style, bukan Tailwind — lebih reliable
         backgroundColor: "#100e0a",
         height: "100svh",
         minHeight: "100dvh",
         isolation: "isolate",
+        position: "relative",  // ← eksplisit, fix warning useScroll
       }}
     >
-      {/* ── Layer 1: Foto ── */}
+      {/* ── Layer 1: Foto GPU layer ── */}
       <motion.div
         className="absolute inset-0"
-        style={{ scale: photoScale, transformOrigin: "center center", zIndex: 1, willChange: "transform" }}
+        style={{
+          scale: photoScale,
+          transformOrigin: "center center",
+          zIndex: 1,
+          willChange: "transform",
+        }}
       >
         <Image
-          src="/photo/photo (9).jpg"
+          src="/photo/photo (13).jpg"
           alt="Shobiryne portfolio"
           fill
           className="object-cover"
@@ -133,6 +144,7 @@ export default function PolaroidParallax() {
           priority
           quality={mobile ? 65 : 80}
         />
+        {/* Color grade + vignette = 1 div = 1 composited layer */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -144,20 +156,26 @@ export default function PolaroidParallax() {
         />
       </motion.div>
 
-      {/* ── Layer 2: Frame ── */}
+      {/* ── Layer 2: Frame GPU layer (zoom pelan) ── */}
       {mounted && (
         <motion.div
           className="absolute inset-0"
-          style={{ scale: frameScale, rotate, transformOrigin: "center center", zIndex: 20, willChange: "transform" }}
+          style={{
+            scale: frameScale,
+            rotate,
+            transformOrigin: "center center",
+            zIndex: 20,
+            willChange: "transform",
+          }}
         >
           <PolaroidFrame mobile={mobile} />
         </motion.div>
       )}
 
-      {/* ── Layer 3: Grain ── */}
+      {/* ── Layer 3: Grain static — background-image CSS, tidak ada SVG di DOM ── */}
       <div style={GRAIN_STYLE} />
 
-      {/* ── Layer 4: Content ── */}
+      {/* ── Layer 4: Content — tidak ada transform sama sekali ── */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
         style={{
