@@ -11,7 +11,6 @@ const navItems = [
   { label: "Contact",    href: "/contact" },
 ]
 
-// ─── Scroll To Top ─────────────────────────────────────────────
 function ScrollToTop() {
   const { scrollY } = useScroll()
   const [visible, setVisible] = useState(false)
@@ -45,7 +44,6 @@ function ScrollToTop() {
   )
 }
 
-// ─── Hamburger ─────────────────────────────────────────────────
 function HamburgerIcon({ isOpen }: { isOpen: boolean }) {
   return (
     <div className="w-6 h-5 flex flex-col justify-between">
@@ -71,7 +69,6 @@ function HamburgerIcon({ isOpen }: { isOpen: boolean }) {
   )
 }
 
-// ─── Mobile Menu ───────────────────────────────────────────────
 function MobileMenu({ isOpen, onClose, pathname }: { isOpen: boolean; onClose: () => void; pathname: string }) {
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : ""
@@ -120,7 +117,6 @@ function MobileMenu({ isOpen, onClose, pathname }: { isOpen: boolean; onClose: (
               )
             })}
           </ul>
-
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -137,15 +133,24 @@ function MobileMenu({ isOpen, onClose, pathname }: { isOpen: boolean; onClose: (
   )
 }
 
-// ─── Navbar ────────────────────────────────────────────────────
 export default function Navbar() {
   const pathname    = usePathname()
   const { scrollY } = useScroll()
-  const [pastGallery, setPastGallery] = useState(false)
-  const [menuOpen, setMenuOpen]       = useState(false)
+  const [pastHero, setPastHero] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  // null = belum mount (SSR), true/false setelah client mount
+  const [mobile, setMobile] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
+  }, [])
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setPastGallery(latest > window.innerHeight * 0.88)
+    setPastHero(latest > window.innerHeight * 0.88)
   })
 
   useEffect(() => {
@@ -154,67 +159,88 @@ export default function Navbar() {
     return () => window.removeEventListener("resize", onResize)
   }, [])
 
+  // Belum mount → jangan render apapun (hindari flash)
+  if (mobile === null) return null
+
+  // Mobile: sembunyikan navbar di hero, tampilkan hanya setelah scroll atau saat menu buka
+  // Desktop: selalu tampil
+  const showNav = mobile ? (pastHero || menuOpen) : true
+
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50">
-        <motion.div
-          className="absolute inset-0 backdrop-blur-md"
-          animate={{ opacity: pastGallery && !menuOpen ? 1 : 0, backgroundColor: "rgba(14,40,48,0.88)" }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-0 left-0 right-0 h-px"
-          animate={{ opacity: pastGallery && !menuOpen ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
-          style={{ background: "linear-gradient(to right, transparent, var(--cyan), transparent)" }}
-        />
-
-        <div className="relative flex justify-between items-center px-6 md:px-8 py-5 md:py-6">
-          <Link
-            href="/"
-            className="italic tracking-wider"
-            style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", color: "var(--gold)" }}
+      <AnimatePresence>
+        {showNav && (
+          <motion.nav
+            key="navbar"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed top-0 left-0 right-0 z-50"
           >
-            Shobiryne
-          </Link>
+            <motion.div
+              className="absolute inset-0 backdrop-blur-md"
+              animate={{
+                opacity: pastHero && !menuOpen ? 1 : 0,
+                backgroundColor: "rgba(14,40,48,0.88)",
+              }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="absolute bottom-0 left-0 right-0 h-px"
+              animate={{ opacity: pastHero && !menuOpen ? 1 : 0 }}
+              transition={{ duration: 0.4 }}
+              style={{ background: "linear-gradient(to right, transparent, var(--cyan), transparent)" }}
+            />
 
-          {/* Desktop */}
-          <ul className="hidden md:flex gap-8">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <li key={item.href} className="relative">
-                  <Link
-                    href={item.href}
-                    className="text-xs tracking-widest uppercase transition-colors duration-300"
-                    style={{ color: isActive ? "var(--cyan)" : "var(--text-muted)" }}
-                  >
-                    {item.label}
-                  </Link>
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNav"
-                      className="absolute -bottom-1 left-0 right-0 h-px"
-                      style={{ backgroundColor: "var(--cyan)", boxShadow: "0 0 8px rgba(34,179,208,0.6)" }}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                </li>
-              )
-            })}
-          </ul>
+            <div className="relative flex justify-between items-center px-6 md:px-8 py-5 md:py-6">
+              <Link
+                href="/"
+                className="italic tracking-wider"
+                style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", color: "var(--gold)" }}
+              >
+                Shobiryne
+              </Link>
 
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden relative z-50 p-2 -mr-2"
-            onClick={() => setMenuOpen(prev => !prev)}
-            aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
-            aria-expanded={menuOpen}
-          >
-            <HamburgerIcon isOpen={menuOpen} />
-          </button>
-        </div>
-      </nav>
+              {/* Desktop */}
+              <ul className="hidden md:flex gap-8">
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <li key={item.href} className="relative">
+                      <Link
+                        href={item.href}
+                        className="text-xs tracking-widest uppercase transition-colors duration-300"
+                        style={{ color: isActive ? "var(--cyan)" : "var(--text-muted)" }}
+                      >
+                        {item.label}
+                      </Link>
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeNav"
+                          className="absolute -bottom-1 left-0 right-0 h-px"
+                          style={{ backgroundColor: "var(--cyan)", boxShadow: "0 0 8px rgba(34,179,208,0.6)" }}
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+
+              {/* Mobile hamburger */}
+              <button
+                className="flex md:hidden"
+                onClick={() => setMenuOpen(prev => !prev)}
+                aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+                aria-expanded={menuOpen}
+              >
+                <HamburgerIcon isOpen={menuOpen} />
+              </button>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} />
       <ScrollToTop />

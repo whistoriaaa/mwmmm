@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/Navbar"
+import BottomNavBar from "@/components/BottomNavBar"
 
 const cormorant = Cormorant_Garamond({
   subsets:  ["latin"],
@@ -52,11 +53,23 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Shobiryne" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="min-h-full flex flex-col">
         <div className="fixed inset-0 -z-10" style={{ backgroundColor: "var(--background)" }} />
+
+        {/* Navbar atas — selalu ada (desktop), muncul setelah scroll (mobile) */}
         <Navbar />
+
         <main>{children}</main>
+
+        {/* BottomNavBar — hanya tampil mobile via CSS */}
+        <div className="md:hidden">
+          <BottomNavBar />
+        </div>
       </body>
     </html>
   )

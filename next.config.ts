@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "picsum.photos",
       }
-    ]
+    ],
+    qualities: [75, 85],
   },
   reactCompiler: true,
 };

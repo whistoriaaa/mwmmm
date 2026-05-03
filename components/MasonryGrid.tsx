@@ -343,7 +343,7 @@ export default function MasonryGrid() {
   const activeSubLabel = activeSubs.find(s => s.key === activeSub)?.label
 
   return (
-    <section id="works" className="px-6 md:px-8 py-20 md:py-28">
+    <section id="works" className="px-6 md:px-8 py-20 md:py-28 pb-24 md:pb-28">
 
       {/* ── Header ─────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-10 md:mb-14">
