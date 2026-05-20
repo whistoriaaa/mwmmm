@@ -29,11 +29,9 @@ export default function PolaroidParallax() {
       ref={containerRef}
       className="relative w-full overflow-hidden"
       style={{
-        backgroundColor: "#100e0a",
-        height: "100svh",
+        backgroundColor: "#000",
+        height: "100dvh",
         minHeight: "100dvh",
-        isolation: "isolate",
-        position: "relative",
       }}
     >
       {/* Foto dengan parallax zoom */}
@@ -51,7 +49,7 @@ export default function PolaroidParallax() {
           alt="Shobiryne portfolio"
           fill
           className="object-cover"
-          style={{ objectPosition: "center 30%" }}
+          style={{ objectPosition: "center center" }}
           priority
           quality={mobile ? 65 : 80}
         />

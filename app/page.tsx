@@ -1,12 +1,13 @@
-import MasonryGrid from "@/components/MasonryGrid"
 import Parallax from "@/components/Parallax"
+import BioBrief from "@/components/home/BioBrief"
+import RecentWorks from "@/components/home/RecentWorks"
 
-export default function PortofolioPage() {
+export default function HomePage() {
   return (
     <>
       <Parallax />
-      <div className="w-full h-px max-w-5xl mx-auto my-0" />
-      <MasonryGrid />
+      <BioBrief />
+      <RecentWorks />
     </>
   )
 }

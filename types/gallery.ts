@@ -7,6 +7,7 @@ export type Item = {
   subCategory?: PotraitSub | ProductSub
   type:        "photo" | "video"
   highlight:   boolean
+  date?:       string  // "YYYY-MM"
 }
 
 export const filters = ["all", "potrait", "event", "product"] as const
