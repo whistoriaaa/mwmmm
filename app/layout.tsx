@@ -66,7 +66,7 @@ export default function RootLayout({
 
         <main>{children}</main>
 
-        {/* BottomNavBar — hanya tampil mobile via CSS */}
+        {/* BottomNavBar — hanya tampil di mobile */}
         <div className="md:hidden">
           <BottomNavBar />
         </div>

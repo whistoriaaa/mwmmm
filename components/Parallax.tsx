@@ -1,102 +1,15 @@
 "use client"
 
-import React, { useRef, useEffect, useState } from "react"
+import { useRef, useEffect, useState } from "react"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "motion/react"
-
-const MAX_ZOOM_DESKTOP = 3.5
-const MAX_ZOOM_MOBILE  = 2.2
-
-// Grain: SVG di-encode jadi data URL statis — tidak ada SVG runtime di DOM
-const GRAIN_STYLE: React.CSSProperties = {
-  position: "absolute",
-  inset: 0,
-  pointerEvents: "none",
-  zIndex: 30,
-  opacity: 0.04,
-  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
-  backgroundRepeat: "repeat",
-  backgroundSize: "200px 200px",
-  mixBlendMode: "overlay",
-  willChange: "auto",
-}
-
-const TECH_TOP    = ["f/1.8", "ISO 400", "1/500s", "35mm", "RAW", "f/2.8", "ISO 200", "1/250s"]
-const TECH_BOTTOM = ["EV +0.3", "AWB", "sRGB", "JPEG+RAW", "AF-S", "±0", "f/1.4", "TTL"]
-const TECH_LEFT   = ["f/1.8", "ISO 400", "1/500s", "35mm", "RAW", "EV 0", "AWB", "f/2.8", "ISO 200", "1/250s", "sRGB", "AF-S"]
-const TECH_RIGHT  = ["JPEG", "f/1.4", "ISO 800", "1/125s", "50mm", "RAW", "EV -0.3", "AWB", "f/4.0", "ISO 100", "1/1000s", "TTL"]
-
-const handFont = "'Dancing Script', 'Segoe Script', cursive"
-const monoFont = "'Courier New', Courier, monospace"
-
-// React.memo — frame tidak re-render saat scroll
-const PolaroidFrame = React.memo(function PolaroidFrame({ mobile }: { mobile: boolean }) {
-  const bt = mobile ? 38 : 72
-  const bs = mobile ? 38 : 72
-  const bb = mobile ? 96 : 184
-  const cream   = "#f5f0e8"
-  const creamDk = "#ede8dc"
-  const ink     = "rgba(60,50,35,0.45)"
-  const ts      = mobile ? 6 : 11
-
-  return (
-    <>
-      {/* TOP */}
-      <div className="absolute left-0 right-0 flex items-center justify-around overflow-hidden"
-        style={{ top: 0, height: bt, background: `linear-gradient(to bottom, ${cream}, ${creamDk})`, zIndex: 20, paddingLeft: bs, paddingRight: bs }}>
-        {TECH_TOP.map((t, i) => (
-          <span key={i} style={{ fontFamily: monoFont, fontSize: ts, color: ink, letterSpacing: "0.06em", whiteSpace: "nowrap", userSelect: "none" }}>{t}</span>
-        ))}
-      </div>
-
-      {/* BOTTOM */}
-      <div className="absolute left-0 right-0 flex flex-col items-center justify-center"
-        style={{ bottom: 0, height: bb, background: `linear-gradient(to top, ${creamDk}, ${cream})`, zIndex: 20, gap: mobile ? 5 : 10 }}>
-        <div className="flex items-center justify-around w-full" style={{ paddingLeft: bs, paddingRight: bs }}>
-          {TECH_BOTTOM.map((t, i) => (
-            <span key={i} style={{ fontFamily: monoFont, fontSize: ts, color: ink, letterSpacing: "0.06em", whiteSpace: "nowrap", userSelect: "none" }}>{t}</span>
-          ))}
-        </div>
-        <div style={{ width: "52%", height: 1, background: "rgba(60,50,35,0.12)" }} />
-        <span style={{ fontFamily: handFont, fontWeight: 600, fontSize: mobile ? 15 : 30, color: "#2a2010", letterSpacing: "0.04em", opacity: 0.75, lineHeight: 1 }}>instax mini</span>
-        <span style={{ fontFamily: handFont, fontWeight: 600, fontSize: mobile ? 10 : 18, color: "#1a6b3a", letterSpacing: "0.12em", opacity: 0.80, lineHeight: 1 }}>Fujifilm</span>
-      </div>
-
-      {/* LEFT */}
-      <div className="absolute flex flex-col justify-around items-center overflow-hidden"
-        style={{ top: 0, bottom: 0, left: 0, width: bs, background: `linear-gradient(to right, ${creamDk}, ${cream})`, zIndex: 20, paddingTop: bt, paddingBottom: bb }}>
-        {TECH_LEFT.slice(0, mobile ? 8 : 12).map((t, i) => (
-          <span key={i} style={{ fontFamily: monoFont, fontSize: ts, color: ink, letterSpacing: "0.05em", whiteSpace: "nowrap", userSelect: "none", writingMode: "vertical-rl", textOrientation: "mixed", transform: "rotate(180deg)" }}>{t}</span>
-        ))}
-      </div>
-
-      {/* RIGHT */}
-      <div className="absolute flex flex-col justify-around items-center overflow-hidden"
-        style={{ top: 0, bottom: 0, right: 0, width: bs, background: `linear-gradient(to left, ${creamDk}, ${cream})`, zIndex: 20, paddingTop: bt, paddingBottom: bb }}>
-        {TECH_RIGHT.slice(0, mobile ? 8 : 12).map((t, i) => (
-          <span key={i} style={{ fontFamily: monoFont, fontSize: ts, color: ink, letterSpacing: "0.05em", whiteSpace: "nowrap", userSelect: "none", writingMode: "vertical-rl", textOrientation: "mixed" }}>{t}</span>
-        ))}
-      </div>
-
-      {/* Outer border */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ zIndex: 25, borderRadius: 0, border: `${mobile ? 2 : 3}px solid rgba(255,255,255,0.35)`,
-          boxShadow: `0 ${mobile ? 12 : 32}px ${mobile ? 45 : 110}px rgba(0,0,0,0.70), 0 ${mobile ? 4 : 10}px ${mobile ? 14 : 35}px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.22)` }} />
-
-      {/* Light leak */}
-      <div className="absolute left-0 right-0 pointer-events-none"
-        style={{ top: bt, height: mobile ? 45 : 100, zIndex: 19, background: "linear-gradient(to bottom, rgba(255,238,180,0.11) 0%, transparent 100%)", mixBlendMode: "screen" }} />
-    </>
-  )
-})
+import { MAX_ZOOM_DESKTOP, MAX_ZOOM_MOBILE } from "@/constants/polaroid"
 
 export default function PolaroidParallax() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [mounted, setMounted] = useState(false)
-  const [mobile, setMobile]   = useState(false)
+  const [mobile, setMobile] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
     const check = () => setMobile(window.innerWidth < 768)
     check()
     window.addEventListener("resize", check)
@@ -110,8 +23,6 @@ export default function PolaroidParallax() {
 
   const maxZoom    = mobile ? MAX_ZOOM_MOBILE : MAX_ZOOM_DESKTOP
   const photoScale = useTransform(scrollYProgress, [0, 1], [1, maxZoom])
-  const frameScale = useTransform(scrollYProgress, [0, 1], [1, mobile ? 1.08 : 1.15])
-  const rotate     = useTransform(scrollYProgress, [0, 1], [0, mobile ? 0.8 : 2.0])
 
   return (
     <div
@@ -122,10 +33,10 @@ export default function PolaroidParallax() {
         height: "100svh",
         minHeight: "100dvh",
         isolation: "isolate",
-        position: "relative",  // ← eksplisit, fix warning useScroll
+        position: "relative",
       }}
     >
-      {/* ── Layer 1: Foto GPU layer ── */}
+      {/* Foto dengan parallax zoom */}
       <motion.div
         className="absolute inset-0"
         style={{
@@ -136,7 +47,7 @@ export default function PolaroidParallax() {
         }}
       >
         <Image
-          src="/photo/photo (13).jpg"
+          src="/photos/hero/4.jpg"
           alt="Shobiryne portfolio"
           fill
           className="object-cover"
@@ -144,7 +55,7 @@ export default function PolaroidParallax() {
           priority
           quality={mobile ? 65 : 80}
         />
-        {/* Color grade + vignette = 1 div = 1 composited layer */}
+        {/* Vignette + color grade */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -156,37 +67,12 @@ export default function PolaroidParallax() {
         />
       </motion.div>
 
-      {/* ── Layer 2: Frame GPU layer (zoom pelan) ── */}
-      {mounted && (
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            scale: frameScale,
-            rotate,
-            transformOrigin: "center center",
-            zIndex: 20,
-            willChange: "transform",
-          }}
-        >
-          <PolaroidFrame mobile={mobile} />
-        </motion.div>
-      )}
-
-      {/* ── Layer 3: Grain static — background-image CSS, tidak ada SVG di DOM ── */}
-      <div style={GRAIN_STYLE} />
-
-      {/* ── Layer 4: Content — tidak ada transform sama sekali ── */}
+      {/* Teks hero */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-        style={{
-          zIndex: 35,
-          paddingBottom: `${mobile ? 96 : 184}px`,
-          paddingTop:    `${mobile ? 38 : 72}px`,
-          paddingLeft:   `${mobile ? 38 : 72}px`,
-          paddingRight:  `${mobile ? 38 : 72}px`,
-        }}
+        style={{ zIndex: 10 }}
       >
-        <div className="text-center">
+        <div className="text-center px-6">
           <h1
             className="font-light italic"
             style={{

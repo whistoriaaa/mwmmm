@@ -85,7 +85,7 @@ export default function ContactSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 py-24 overflow-hidden"
+      className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-32 md:py-24 overflow-hidden"
       style={{ background: "var(--bg, #080c10)" }}
     >
       {/* Background glow */}

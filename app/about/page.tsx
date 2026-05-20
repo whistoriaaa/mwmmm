@@ -1,264 +1,21 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
-import {
-  motion, useScroll, useTransform, useSpring,
-  useMotionValue
-} from "motion/react"
+import { useRef } from "react"
+import { motion, useScroll, useTransform } from "motion/react"
 import Image from "next/image"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { SplitText } from "gsap/SplitText"
 import { useGSAP } from "@gsap/react"
+import { Spotlight } from "@/components/about/Spotlight"
+import { MagneticBtn } from "@/components/about/MagneticBtn"
+import { TiltCard } from "@/components/about/TiltCard"
+import { ParallaxPhoto } from "@/components/about/ParallaxPhoto"
+import { SectionTitle } from "@/components/about/SectionTitle"
+import { services } from "@/data/services"
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
 
-const services = [
-  {
-    title: "Portrait Session",
-    desc: "Personal & professional portrait photography dengan konsep sinematik.",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Landscape & Travel",
-    desc: "Merekam keindahan alam dan momen perjalanan dalam komposisi dramatis.",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-        <path d="M3 20l4-8 4 5 3-3 7 6"/><path d="M20 4l-3 7"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Cinematic Video",
-    desc: "Produksi video pendek dengan nuansa film — untuk brand, event, maupun personal.",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-        <rect x="2" y="6" width="14" height="13" rx="2"/><path d="M16 10l5-3v10l-5-3"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Color Grading",
-    desc: "Retouching & color grading profesional untuk hasil akhir yang konsisten dan estetik.",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-        <circle cx="12" cy="12" r="9"/><path d="M12 3v9l5.2 3"/>
-      </svg>
-    ),
-  },
-]
-
-function useMousePosition() {
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  useEffect(() => {
-    const move = (e: MouseEvent) => { x.set(e.clientX); y.set(e.clientY) }
-    window.addEventListener("mousemove", move)
-    return () => window.removeEventListener("mousemove", move)
-  }, [x, y])
-  return { x, y }
-}
-
-function use3DTilt(strength = 10) {
-  const rotateX = useMotionValue(0)
-  const rotateY = useMotionValue(0)
-  const springX = useSpring(rotateX, { stiffness: 180, damping: 22 })
-  const springY = useSpring(rotateY, { stiffness: 180, damping: 22 })
-  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const cx = rect.left + rect.width / 2
-    const cy = rect.top + rect.height / 2
-    rotateY.set(((e.clientX - cx) / (rect.width / 2)) * strength)
-    rotateX.set(((e.clientY - cy) / (rect.height / 2)) * -strength)
-  }
-  const onMouseLeave = () => { rotateX.set(0); rotateY.set(0) }
-  return { springX, springY, onMouseMove, onMouseLeave }
-}
-
-function Spotlight() {
-  const { x, y } = useMousePosition()
-  const sx = useSpring(x, { stiffness: 80, damping: 20 })
-  const sy = useSpring(y, { stiffness: 80, damping: 20 })
-  const [visible, setVisible] = useState(false)
-  const bgGradient = useTransform(
-    [sx, sy],
-    ([cx, cy]: number[]) =>
-      `radial-gradient(320px circle at ${cx}px ${cy}px, rgba(34,179,208,0.045) 0%, transparent 70%)`
-  )
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 600)
-    return () => clearTimeout(t)
-  }, [])
-  if (!visible) return null
-  return (
-    <motion.div
-      className="fixed inset-0 pointer-events-none z-50"
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      style={{ background: bgGradient }}
-    />
-  )
-}
-
-function MagneticBtn({ children, className, style, href }: {
-  children: React.ReactNode; className?: string
-  style?: React.CSSProperties; href?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const x = useMotionValue(0); const y = useMotionValue(0)
-  const sx = useSpring(x, { stiffness: 200, damping: 18 })
-  const sy = useSpring(y, { stiffness: 200, damping: 18 })
-  const onMove = (e: React.MouseEvent) => {
-    const rect = ref.current!.getBoundingClientRect()
-    x.set((e.clientX - rect.left - rect.width / 2) * 0.35)
-    y.set((e.clientY - rect.top - rect.height / 2) * 0.35)
-  }
-  const onLeave = () => { x.set(0); y.set(0) }
-  return (
-    <motion.div ref={ref} style={{ x: sx, y: sy, display: "inline-block" }}
-      onMouseMove={onMove} onMouseLeave={onLeave}>
-      <motion.a href={href} whileTap={{ scale: 0.95 }} className={className} style={style}>
-        {children}
-      </motion.a>
-    </motion.div>
-  )
-}
-
-function TiltCard({ children, className, style }: {
-  children: React.ReactNode; className?: string; style?: React.CSSProperties
-}) {
-  const { springX, springY, onMouseMove, onMouseLeave } = use3DTilt()
-  const glowX = useMotionValue(50); const glowY = useMotionValue(50)
-  const glowBg = useTransform(
-    [glowX, glowY],
-    ([gx, gy]: number[]) =>
-      `radial-gradient(circle at ${gx}% ${gy}%, rgba(34,179,208,0.12) 0%, transparent 55%)`
-  )
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    onMouseMove(e)
-    const rect = e.currentTarget.getBoundingClientRect()
-    glowX.set(((e.clientX - rect.left) / rect.width) * 100)
-    glowY.set(((e.clientY - rect.top) / rect.height) * 100)
-  }
-  return (
-    <motion.div
-      onMouseMove={onMove} onMouseLeave={onMouseLeave}
-      style={{ rotateX: springX, rotateY: springY, transformStyle: "preserve-3d", perspective: 800, ...style }}
-      className={className}
-    >
-      <motion.div
-        className="absolute inset-0 pointer-events-none rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: glowBg }}
-      />
-      {children}
-    </motion.div>
-  )
-}
-
-// ─── ParallaxPhoto: foto full-width dengan efek parallax ──────
-function ParallaxPhoto({
-  src, alt, height = "70vh", speed = 0.3,
-  overlayOpacity = 0.45, children,
-}: {
-  src: string; alt: string; height?: string; speed?: number
-  overlayOpacity?: number; children?: React.ReactNode
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  })
-  // Foto bergerak lebih lambat dari scroll → efek parallax
-  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"])
-
-  return (
-    <div
-      ref={ref}
-      className="relative w-full overflow-hidden"
-      style={{ height }}
-    >
-      {/* Foto — sedikit lebih tinggi agar parallax tidak crop */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ y, height: "130%", top: "-15%" }}
-      >
-        <Image
-          src={src} alt={alt} fill
-          className="object-cover"
-          style={{ filter: "saturate(0.75) brightness(0.82)" }}
-        />
-      </motion.div>
-
-      {/* Overlay gradient atas-bawah */}
-      <div
-        className="absolute inset-0 z-10"
-        style={{
-          background: `linear-gradient(
-            to bottom,
-            rgba(8,18,22,${overlayOpacity}) 0%,
-            transparent 30%,
-            transparent 70%,
-            rgba(8,18,22,${overlayOpacity}) 100%
-          )`,
-        }}
-      />
-
-      {/* Konten opsional di atas foto */}
-      {children && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center">
-          {children}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function SectionTitle({ label, title }: { label: string; title: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  useGSAP(() => {
-    const el = ref.current
-    if (!el) return
-    const heading = el.querySelector("h2")
-    if (!heading) return
-    const split = new SplitText(heading, { type: "chars" })
-    gsap.from(split.chars, {
-      opacity: 0, y: 30, rotateX: -60,
-      stagger: 0.03, duration: 0.7, ease: "power3.out",
-      scrollTrigger: { trigger: el, start: "top 85%", once: true },
-    })
-    return () => split.revert()
-  }, { scope: ref })
-  return (
-    <div ref={ref} className="mb-12 md:mb-16">
-      <motion.span
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 0.7, x: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        viewport={{ once: true }}
-        className="block text-xs tracking-[0.45em] uppercase mb-3"
-        style={{ color: "var(--cyan)" }}
-      >
-        {label}
-      </motion.span>
-      <h2
-        className="font-light italic"
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(2rem, 4vw, 3.2rem)",
-          color: "var(--gold)", lineHeight: 1.15, perspective: "400px",
-        }}
-      >
-        {title}
-      </h2>
-    </div>
-  )
-}
-
-// ─── About Page ────────────────────────────────────────────────
 export default function AboutPage() {
   const heroRef      = useRef<HTMLDivElement>(null)
   const heroTitleRef = useRef<HTMLHeadingElement>(null)
@@ -293,7 +50,7 @@ export default function AboutPage() {
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <motion.div style={{ y: heroBgY, scale: heroScale }} className="absolute inset-0 z-0">
           <Image
-            src="/photo/photo (9).jpg"
+            src="/photos/hero/1.jpg"
             alt="About hero" fill className="object-cover"
             style={{ filter: "brightness(0.2) saturate(0.5)" }} priority
           />
@@ -382,7 +139,7 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      {/* ── SECTION KOSONG — BIO TEXT ────────────────────────── */}
+      {/* ── BIO TEXT ─────────────────────────────────────────── */}
       <section className="px-6 md:px-16 py-28 md:py-36 max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -402,7 +159,6 @@ export default function AboutPage() {
             Tentang Saya
           </motion.span>
 
-          {/* Garis */}
           <motion.div
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
@@ -429,7 +185,6 @@ export default function AboutPage() {
             </motion.p>
           ))}
 
-          {/* Tags */}
           <div className="flex flex-wrap gap-3 pt-2">
             {["Indonesia", "Portrait", "Landscape", "Cinematic", "Color Grading"].map((tag, i) => (
               <motion.span
@@ -449,9 +204,9 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      {/* ── FOTO PARALLAX 2 ──────────────────────────────────── */}
+      {/* ── FOTO PARALLAX ────────────────────────────────────── */}
       <ParallaxPhoto
-        src="/photo/photo (12).jpg"
+        src="/photos/hero/2.jpg"
         alt="Shobiryne - Landscape"
         height="65vh"
         speed={0.25}
@@ -528,7 +283,7 @@ export default function AboutPage() {
       <section className="px-6 md:px-16 py-28 md:py-40 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <Image
-            src="/photo/photo (3).jpg"
+            src="/photos/hero/3.jpg"
             alt="" fill className="object-cover"
             style={{ filter: "brightness(0.08) saturate(0.4)" }}
           />
