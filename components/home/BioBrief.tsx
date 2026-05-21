@@ -89,7 +89,7 @@ export default function BioBrief() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 + i * 0.06, duration: 0.4 }}
-              className="text-[10px] tracking-widest uppercase px-3 py-1 rounded-full"
+              className="text-[10px] tracking-widest uppercase px-3 py-1 rounded-lg"
               style={{
                 border: "1px solid rgba(34,179,208,0.18)",
                 color: "var(--text-muted)",
@@ -110,7 +110,7 @@ export default function BioBrief() {
         >
           <Link
             href="/kategori"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs tracking-widest uppercase transition-all duration-300"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs tracking-widest uppercase transition-all duration-300"
             style={{
               background: "rgba(34,179,208,0.1)",
               border: "1px solid rgba(34,179,208,0.35)",

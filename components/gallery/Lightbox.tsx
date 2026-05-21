@@ -121,7 +121,7 @@ export function Lightbox({ item, items, onClose, onPrev, onNext }: {
 
       <motion.button initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ delay: 0.2 }}
         onClick={e => { e.stopPropagation(); onPrev() }} aria-label="Sebelumnya"
-        className="absolute left-4 md:left-8 w-11 h-11 flex items-center justify-center rounded-full border"
+        className="absolute left-4 md:left-8 w-11 h-11 flex items-center justify-center rounded-lg border"
         style={{ borderColor: "var(--cyan)", color: "var(--cyan)" }}
         whileHover={{ backgroundColor: "rgba(34,179,208,0.1)" }}
       >
@@ -130,7 +130,7 @@ export function Lightbox({ item, items, onClose, onPrev, onNext }: {
 
       <motion.button initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ delay: 0.2 }}
         onClick={e => { e.stopPropagation(); onNext() }} aria-label="Berikutnya"
-        className="absolute right-4 md:right-8 w-11 h-11 flex items-center justify-center rounded-full border"
+        className="absolute right-4 md:right-8 w-11 h-11 flex items-center justify-center rounded-lg border"
         style={{ borderColor: "var(--cyan)", color: "var(--cyan)" }}
         whileHover={{ backgroundColor: "rgba(34,179,208,0.1)" }}
       >
@@ -139,7 +139,7 @@ export function Lightbox({ item, items, onClose, onPrev, onNext }: {
 
       <motion.button initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ delay: 0.1 }}
         onClick={onClose} aria-label="Tutup"
-        className="absolute top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full border"
+        className="absolute top-5 right-5 w-10 h-10 flex items-center justify-center rounded-lg border"
         style={{ borderColor: "var(--pink)", color: "var(--pink)" }}
         whileHover={{ backgroundColor: "rgba(207,83,155,0.12)" }}
       >

@@ -27,7 +27,7 @@ export function TiltCard({ children, className, style }: {
       className={className}
     >
       <motion.div
-        className="absolute inset-0 pointer-events-none rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="absolute inset-0 pointer-events-none rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: glowBg }}
       />
       {children}

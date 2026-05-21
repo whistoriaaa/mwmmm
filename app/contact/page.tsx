@@ -133,7 +133,7 @@ export default function ContactSection() {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center text-center gap-4 px-6 py-8 rounded-sm"
+            className="flex flex-col items-center text-center gap-4 px-6 py-8 rounded-lg"
             style={{
               border: `1px solid ${link.border}`,
               background: "rgba(255,255,255,0.02)",
@@ -147,7 +147,7 @@ export default function ContactSection() {
           >
             {/* Icon */}
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+              className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
               style={{ border: `1px solid ${link.border}`, color: link.color }}
             >
               {link.icon}
@@ -182,7 +182,7 @@ export default function ContactSection() {
       {/* ── Availability badge ───────────────────────────────── */}
       <div ref={badgeRef} className="mt-14 z-10">
         <div
-          className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full"
+          className="inline-flex items-center gap-3 px-5 py-2.5 rounded-lg"
           style={{
             border: "1px solid rgba(1,105,111,0.3)",
             background: "rgba(1,105,111,0.05)",

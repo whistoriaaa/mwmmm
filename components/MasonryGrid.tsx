@@ -87,7 +87,7 @@ export default function MasonryGrid() {
                 <button
                   onClick={() => setActiveSub(null)}
                   aria-label="Reset"
-                  className="w-4 h-4 flex items-center justify-center rounded-full transition-opacity duration-200 opacity-50 hover:opacity-100"
+                  className="w-4 h-4 flex items-center justify-center rounded-lg transition-opacity duration-200 opacity-50 hover:opacity-100"
                   style={{ border: "1px solid var(--text-muted)", color: "var(--text-muted)" }}
                 >
                   <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -115,7 +115,7 @@ export default function MasonryGrid() {
                 {active === f && (
                   <motion.div
                     layoutId="filterBar"
-                    className="absolute inset-0 rounded-full border"
+                    className="absolute inset-0 rounded-lg border"
                     style={{ borderColor: "var(--pink)" }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
@@ -160,7 +160,7 @@ export default function MasonryGrid() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="break-inside-avoid mb-3 group relative overflow-hidden rounded-sm cursor-pointer"
+              className="break-inside-avoid mb-3 group relative overflow-hidden rounded-lg cursor-pointer"
               whileHover={{ y: -5 }}
               onClick={() => openItem(item, index, filtered)}
             >

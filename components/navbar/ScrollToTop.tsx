@@ -22,7 +22,7 @@ export function ScrollToTop() {
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top"
-          className="fixed bottom-20 right-4 z-50 w-11 h-11 flex items-center justify-center rounded-full border"
+          className="fixed bottom-20 right-4 z-50 w-11 h-11 flex items-center justify-center rounded-lg border"
           style={{ background: "var(--bg-surface)", borderColor: "var(--cyan)", color: "var(--cyan)", backdropFilter: "blur(8px)" }}
           whileHover={{ scale: 1.1, backgroundColor: "rgba(34,179,208,0.1)" }}
           whileTap={{ scale: 0.95 }}

@@ -194,7 +194,7 @@ export default function AboutPage() {
                 transition={{ delay: i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.1, backgroundColor: "rgba(34,179,208,0.08)", color: "var(--cyan)" }}
-                className="text-xs tracking-widest uppercase px-3 py-1.5 rounded-full cursor-default"
+                className="text-xs tracking-widest uppercase px-3 py-1.5 rounded-lg cursor-default"
                 style={{ border: "1px solid rgba(34,179,208,0.2)", color: "var(--text-muted)", transition: "color 0.3s, background 0.3s" }}
               >
                 {tag}
@@ -248,7 +248,7 @@ export default function AboutPage() {
               viewport={{ once: true }}
             >
               <TiltCard
-                className="relative p-6 rounded-sm flex flex-col gap-4 group overflow-hidden cursor-default h-full"
+                className="relative p-6 rounded-lg flex flex-col gap-4 group overflow-hidden cursor-default h-full"
                 style={{ border: "1px solid rgba(34,179,208,0.1)", background: "rgba(14,40,48,0.3)" }}
               >
                 <motion.div
@@ -343,11 +343,11 @@ export default function AboutPage() {
           >
             <MagneticBtn
               href="/contact"
-              className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full text-xs tracking-widest uppercase relative overflow-hidden group"
+              className="inline-flex items-center gap-3 px-8 py-3.5 rounded-lg text-xs tracking-widest uppercase relative overflow-hidden group"
               style={{ border: "1px solid var(--cyan)", color: "var(--cyan)" }}
             >
               <motion.span
-                className="absolute inset-0 rounded-full pointer-events-none"
+                className="absolute inset-0 rounded-lg pointer-events-none"
                 initial={{ scaleX: 0, originX: "0%" }}
                 whileHover={{ scaleX: 1 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}

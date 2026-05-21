@@ -42,7 +42,7 @@ export default function KategoriPage() {
         {/* ── Sticky header filter ── */}
         <div
           className="sticky top-0 z-40"
-          style={{ background: "rgba(8,12,16,0.92)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "rgba(33,32,40,0.97)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
         >
           <div
             className="px-4 md:px-8"
@@ -60,7 +60,7 @@ export default function KategoriPage() {
               {/* All */}
               <button
                 onClick={() => { setMainCat(null); setSubCat(null) }}
-                className="flex-none px-4 py-1.5 rounded-full text-[11px] tracking-wider uppercase transition-all duration-200"
+                className="flex-none px-4 py-1.5 rounded-lg text-[11px] tracking-wider uppercase transition-all duration-200"
                 style={{
                   background:   !mainCat ? "var(--cyan)"              : "rgba(255,255,255,0.05)",
                   color:        !mainCat ? "#000"                      : "var(--text-muted)",
@@ -75,7 +75,7 @@ export default function KategoriPage() {
                 <button
                   key={cat.key}
                   onClick={() => selectMain(cat.key)}
-                  className="flex-none px-4 py-1.5 rounded-full text-[11px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
+                  className="flex-none px-4 py-1.5 rounded-lg text-[11px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
                   style={{
                     background: mainCat === cat.key ? "var(--cyan)"                  : "rgba(255,255,255,0.05)",
                     color:      mainCat === cat.key ? "#000"                          : "var(--text-muted)",
@@ -103,7 +103,7 @@ export default function KategoriPage() {
                     {/* All sub */}
                     <button
                       onClick={() => setSubCat(null)}
-                      className="flex-none px-3 py-1 rounded-full text-[10px] tracking-wider uppercase transition-all duration-200"
+                      className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200"
                       style={{
                         background: !subCat ? "rgba(211,179,102,0.14)" : "transparent",
                         color:      !subCat ? "var(--gold)"             : "var(--text-faint)",
@@ -117,7 +117,7 @@ export default function KategoriPage() {
                       <button
                         key={s.key}
                         onClick={() => setSubCat(prev => prev === s.key ? null : s.key)}
-                        className="flex-none px-3 py-1 rounded-full text-[10px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
+                        className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
                         style={{
                           background: subCat === s.key ? "rgba(211,179,102,0.14)" : "transparent",
                           color:      subCat === s.key ? "var(--gold)"             : "var(--text-faint)",

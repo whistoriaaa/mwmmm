@@ -138,7 +138,7 @@ export default function RecentWorks() {
                       style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%)" }}
                     >
                       <div
-                        className="self-end text-[9px] tracking-wider uppercase px-2 py-0.5 rounded-full"
+                        className="self-end text-[9px] tracking-wider uppercase px-2 py-0.5 rounded-lg"
                         style={{
                           background: "rgba(0,0,0,0.55)",
                           backdropFilter: "blur(6px)",
@@ -172,7 +172,7 @@ export default function RecentWorks() {
         >
           <Link
             href="/kategori"
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-full text-xs tracking-widest uppercase transition-all duration-300"
+            className="inline-flex items-center gap-3 px-6 py-3 rounded-lg text-xs tracking-widest uppercase transition-all duration-300"
             style={{
               border: "1px solid rgba(211,179,102,0.3)",
               color: "var(--gold)",

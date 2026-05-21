@@ -28,7 +28,7 @@ export function SubFilter<T extends string>({
       <div className="flex gap-1.5 flex-wrap justify-end pt-1.5">
         <button
           onClick={() => onSelect(null)}
-          className="px-3 py-1 rounded-full text-xs tracking-wider uppercase transition-all duration-250"
+          className="px-3 py-1 rounded-lg text-xs tracking-wider uppercase transition-all duration-250"
           style={{
             color:           active === null ? "var(--gold)" : "var(--text-muted)",
             border:          `1px solid ${active === null ? "var(--gold)" : "rgba(255,255,255,0.1)"}`,
@@ -42,7 +42,7 @@ export function SubFilter<T extends string>({
           <button
             key={key}
             onClick={() => onSelect(active === key ? null : key)}
-            className="px-3 py-1 rounded-full text-xs tracking-wider uppercase transition-all duration-250"
+            className="px-3 py-1 rounded-lg text-xs tracking-wider uppercase transition-all duration-250"
             style={{
               color:           active === key ? "var(--gold)" : "var(--text-muted)",
               border:          `1px solid ${active === key ? "var(--gold)" : "rgba(255,255,255,0.1)"}`,

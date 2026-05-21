@@ -187,7 +187,7 @@ export function PhotoViewer({ photos, initialIndex, onClose }: {
       >
         <button
           onClick={onClose}
-          className="w-9 h-9 flex items-center justify-center rounded-full"
+          className="w-9 h-9 flex items-center justify-center rounded-lg"
           style={{ background: "rgba(255,255,255,0.13)", backdropFilter: "blur(8px)" }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round">
@@ -269,14 +269,14 @@ export function PhotoViewer({ photos, initialIndex, onClose }: {
       {/* ── Desktop arrows ── */}
       <button
         onClick={() => navigate(-1)}
-        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 hidden md:flex items-center justify-center rounded-full"
+        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 hidden md:flex items-center justify-center rounded-lg"
         style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)" }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <button
         onClick={() => navigate(1)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 hidden md:flex items-center justify-center rounded-full"
+        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 hidden md:flex items-center justify-center rounded-lg"
         style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)" }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
