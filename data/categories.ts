@@ -28,7 +28,7 @@ export const categoryDefs: CategoryDef[] = [
     subs: [
       { key: "graduation", label: "Graduation"         },
       { key: "personal",   label: "Personal Photoshot" },
-      { key: "fashionis",  label: "Fashionis"          },
+      { key: "fashionis",  label: "Fashion Lifestyle"  },
       { key: "couple",     label: "Couple Session"     },
     ],
   },
@@ -36,11 +36,11 @@ export const categoryDefs: CategoryDef[] = [
     key: "special",
     label: "Special Moment",
     subs: [
+      { key: "wedding",          label: "Wedding"         },
+      { key: "prewedding",       label: "Prewedding"      },
+      { key: "engagement",       label: "Engagement"      },
       { key: "birthday",         label: "Birthday Party"  },
       { key: "maternity",        label: "Maternity"       },
-      { key: "engagement",       label: "Engagement"      },
-      { key: "prewedding",       label: "Prewedding"      },
-      { key: "wedding",          label: "Wedding"         },
       { key: "family-vacation",  label: "Family Vacation" },
     ],
   },
