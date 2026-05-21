@@ -45,13 +45,13 @@ export default function PolaroidParallax() {
         }}
       >
         <Image
-          src="/photos/hero/4.jpg"
+          src="/photos/hero/DSCF0093.jpg"
           alt="Shobiryne portfolio"
           fill
           className="object-cover"
           style={{ objectPosition: "center center" }}
           priority
-          quality={mobile ? 65 : 80}
+          quality={75}
         />
         {/* Vignette + color grade */}
         <div

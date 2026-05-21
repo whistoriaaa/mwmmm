@@ -36,8 +36,8 @@ const contactLinks = [
       </svg>
     ),
     color: "var(--cyan)",
-    highlight: "rgba(1,105,111,0.08)",
-    border: "rgba(1,105,111,0.25)",
+    highlight: "var(--bg-surface-2)",
+    border: "var(--border-accent)",
   },
   {
     label: "Email",
@@ -86,7 +86,7 @@ export default function ContactSection() {
     <section
       ref={sectionRef}
       className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 pt-20 pb-32 md:py-24 overflow-hidden"
-      style={{ background: "var(--bg, #080c10)" }}
+      style={{ background: "var(--background)" }}
     >
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden>
@@ -136,7 +136,7 @@ export default function ContactSection() {
             className="flex flex-col items-center text-center gap-4 px-6 py-8 rounded-lg"
             style={{
               border: `1px solid ${link.border}`,
-              background: "rgba(255,255,255,0.02)",
+              background: "var(--bg-surface)",
             }}
             whileHover={{
               background: link.highlight,
@@ -184,8 +184,8 @@ export default function ContactSection() {
         <div
           className="inline-flex items-center gap-3 px-5 py-2.5 rounded-lg"
           style={{
-            border: "1px solid rgba(1,105,111,0.3)",
-            background: "rgba(1,105,111,0.05)",
+            border: "1px solid var(--border-accent)",
+            background: "var(--bg-surface)",
           }}
         >
           <span className="relative flex h-2 w-2">
@@ -206,7 +206,7 @@ export default function ContactSection() {
       {/* ── Footer ───────────────────────────────────────────── */}
       <div className="mt-20 z-10 text-center">
         <div className="w-px h-12 mx-auto mb-6"
-          style={{ background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.08))" }} />
+          style={{ background: "linear-gradient(to bottom, transparent, var(--border))" }} />
         <p className="text-xs tracking-[0.3em] uppercase"
           style={{ color: "var(--text-muted, #8a9baa)", opacity: 0.35 }}>
           © {new Date().getFullYear()} Shobiryne. All rights reserved.

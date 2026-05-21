@@ -4,10 +4,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import { useState } from "react"
-import { allPhotos } from "@/data/portfolio"
-import type { Item } from "@/types/gallery"
+import { allCategoryPhotos, categoryDefs, type Photo } from "@/data/categories"
 import { PhotoViewer } from "@/components/kategori/PhotoViewer"
-import type { Photo } from "@/data/categories"
 
 const MONTHS: Record<string, string> = {
   "01": "Januari", "02": "Februari", "03": "Maret",
@@ -21,14 +19,14 @@ function formatMonth(dateStr: string) {
   return `${MONTHS[month] ?? month} ${year}`
 }
 
-function itemToPhoto(item: Item): Photo {
-  return { id: item.id, src: item.src, w: item.w, h: item.h, category: "portrait" }
-}
+const allSubDefs = categoryDefs.flatMap(c => c.subs ?? [])
 
-const categoryLabel: Record<string, string> = {
-  potrait: "Portrait",
-  event:   "Event",
-  product: "Product",
+function photoLabel(photo: Photo): string {
+  if (photo.sub) {
+    return allSubDefs.find(s => s.key === photo.sub)?.label ?? photo.sub
+  }
+  const catLabels: Record<string, string> = { portrait: "Portrait", special: "Special", event: "Event" }
+  return catLabels[photo.category] ?? photo.category
 }
 
 export default function RecentWorks() {
@@ -36,8 +34,8 @@ export default function RecentWorks() {
   const [viewerIdx,   setViewerIdx]   = useState(0)
   const [viewerList,  setViewerList]  = useState<Photo[]>([])
 
-  const withDate = allPhotos.filter(p => p.date)
-  const grouped = withDate.reduce<Record<string, Item[]>>((acc, p) => {
+  const withDate = allCategoryPhotos.filter(p => p.date)
+  const grouped = withDate.reduce<Record<string, Photo[]>>((acc, p) => {
     const key = p.date!
     if (!acc[key]) acc[key] = []
     acc[key].push(p)
@@ -45,8 +43,8 @@ export default function RecentWorks() {
   }, {})
   const sortedMonths = Object.keys(grouped).sort().reverse()
 
-  const openViewer = (allInMonth: Item[], idx: number) => {
-    setViewerList(allInMonth.map(itemToPhoto))
+  const openViewer = (allInMonth: Photo[], idx: number) => {
+    setViewerList(allInMonth)
     setViewerIdx(idx)
     setViewerOpen(true)
   }
@@ -152,7 +150,7 @@ export default function RecentWorks() {
                         className="text-[10px] tracking-widest uppercase"
                         style={{ color: "rgba(255,255,255,0.75)" }}
                       >
-                        {categoryLabel[photo.category] ?? photo.category}
+                        {photoLabel(photo)}
                       </span>
                     </div>
                   </motion.div>

@@ -3,6 +3,8 @@ import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/Navbar"
 import BottomNavBar from "@/components/BottomNavBar"
+import { ThemeProvider } from "@/components/ThemeProvider"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 const cormorant = Cormorant_Garamond({
   subsets:  ["latin"],
@@ -47,7 +49,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`} suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -57,19 +59,22 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap"
           rel="stylesheet"
         />
+        {/* Cegah flash saat load — baca localStorage sebelum React hydrate */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();` }} />
       </head>
-      <body className="min-h-full flex flex-col">
-        <div className="fixed inset-0 -z-10" style={{ backgroundColor: "var(--background)" }} />
-
-        {/* Navbar atas — selalu ada (desktop), muncul setelah scroll (mobile) */}
-        <Navbar />
-
-        <main>{children}</main>
-
-        {/* BottomNavBar — hanya tampil di mobile */}
-        <div className="md:hidden">
-          <BottomNavBar />
-        </div>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <ThemeProvider>
+          <div className="fixed inset-0 -z-10" style={{ backgroundColor: "var(--background)" }} />
+          <Navbar />
+          {/* Toggle fixed pojok kanan atas, selalu di atas semua layer */}
+          <div className="fixed top-3 right-3 z-70">
+            <ThemeToggle />
+          </div>
+          <main>{children}</main>
+          <div className="md:hidden">
+            <BottomNavBar />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )

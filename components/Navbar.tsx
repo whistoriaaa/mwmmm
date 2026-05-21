@@ -42,10 +42,8 @@ export default function Navbar() {
         >
           <motion.div
             className="absolute inset-0 backdrop-blur-md"
-            animate={{
-              opacity: pastHero ? 1 : 0,
-              backgroundColor: "rgba(14,40,48,0.88)",
-            }}
+            animate={{ opacity: pastHero ? 1 : 0 }}
+            style={{ backgroundColor: "var(--navbar-bg)" }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
           />
           <motion.div
@@ -80,7 +78,7 @@ export default function Navbar() {
                       <motion.div
                         layoutId="activeNav"
                         className="absolute -bottom-1 left-0 right-0 h-px"
-                        style={{ backgroundColor: "var(--cyan)", boxShadow: "0 0 8px rgba(34,179,208,0.6)" }}
+                        style={{ backgroundColor: "var(--cyan)", boxShadow: "0 0 8px var(--border-accent)" }}
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}

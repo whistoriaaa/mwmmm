@@ -26,13 +26,14 @@ export function ParallaxPhoto({
       style={{ height }}
     >
       <motion.div
-        className="absolute inset-0"
+        className="absolute left-0 right-0"
         style={{ y, height: "130%", top: "-15%" }}
       >
         <Image
           src={src} alt={alt} fill
           className="object-cover"
           style={{ filter: "saturate(0.75) brightness(0.82)" }}
+          sizes="100vw"
         />
       </motion.div>
 

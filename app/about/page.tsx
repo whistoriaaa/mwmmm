@@ -43,7 +43,7 @@ export default function AboutPage() {
   }, { scope: heroRef })
 
   return (
-    <main style={{ background: "var(--bg)", color: "var(--text-primary)" }}>
+    <main style={{ background: "var(--background)", color: "var(--text-primary)" }}>
       <Spotlight />
 
       {/* ── HERO ─────────────────────────────────────────────── */}
@@ -118,7 +118,7 @@ export default function AboutPage() {
           <p
             ref={heroCopyRef}
             className="text-sm md:text-base leading-relaxed max-w-lg mx-auto"
-            style={{ color: "var(--text-muted)" }}
+            style={{ color: "rgba(240,236,228,0.72)" }}
           >
             Saya percaya bahwa setiap momen memiliki cahayanya sendiri —
             tugas saya adalah menemukannya dan mengabadikannya sebelum menghilang.
@@ -193,9 +193,9 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ delay: i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 viewport={{ once: true }}
-                whileHover={{ scale: 1.1, backgroundColor: "rgba(34,179,208,0.08)", color: "var(--cyan)" }}
+                whileHover={{ scale: 1.1, color: "var(--cyan)" }}
                 className="text-xs tracking-widest uppercase px-3 py-1.5 rounded-lg cursor-default"
-                style={{ border: "1px solid rgba(34,179,208,0.2)", color: "var(--text-muted)", transition: "color 0.3s, background 0.3s" }}
+                style={{ border: "1px solid var(--border-accent)", color: "var(--text-muted)", transition: "color 0.3s, background 0.3s" }}
               >
                 {tag}
               </motion.span>
@@ -206,7 +206,7 @@ export default function AboutPage() {
 
       {/* ── FOTO PARALLAX ────────────────────────────────────── */}
       <ParallaxPhoto
-        src="/photos/hero/2.jpg"
+        src="/photos/hero/4.jpg"
         alt="Shobiryne - Landscape"
         height="65vh"
         speed={0.25}
@@ -249,7 +249,7 @@ export default function AboutPage() {
             >
               <TiltCard
                 className="relative p-6 rounded-lg flex flex-col gap-4 group overflow-hidden cursor-default h-full"
-                style={{ border: "1px solid rgba(34,179,208,0.1)", background: "rgba(14,40,48,0.3)" }}
+                style={{ border: "1px solid var(--border-accent)", background: "var(--card-surface)" }}
               >
                 <motion.div
                   className="absolute top-0 left-0 h-px w-0 group-hover:w-full"
@@ -280,26 +280,25 @@ export default function AboutPage() {
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────── */}
-      <section className="px-6 md:px-16 py-28 md:py-40 relative overflow-hidden">
+      <section className="px-6 md:px-16 py-28 md:py-40 relative overflow-hidden"
+        style={{ background: "#0d0c11" }}
+      >
         <div className="absolute inset-0 pointer-events-none">
           <Image
-            src="/photos/hero/3.jpg"
+            src="/photos/hero/1.jpg"
             alt="" fill className="object-cover"
-            style={{ filter: "brightness(0.08) saturate(0.4)" }}
+            style={{ filter: "brightness(0.18) saturate(0.5)", mixBlendMode: "luminosity" }}
           />
         </div>
-
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          }}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at center, rgba(33,32,40,0.55) 0%, rgba(13,12,17,0.92) 100%)" }}
         />
 
         {[200, 350, 500].map((size, i) => (
           <motion.div
             key={size}
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
-            style={{ width: size, height: size, border: "1px solid rgba(34,179,208,0.06)" }}
+            style={{ width: size, height: size, border: "1px solid rgba(255,255,255,0.05)" }}
             animate={{ scale: [1, 1.04, 1], opacity: [0.4, 0.7, 0.4] }}
             transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.8 }}
           />

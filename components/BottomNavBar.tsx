@@ -60,10 +60,10 @@ export default function BottomNavBar() {
       <div
         className="rounded-2xl"
         style={{
-          background: "rgba(14,18,22,0.94)",
+          background: "var(--bottom-nav-bg)",
           backdropFilter: "blur(24px)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+          border: "1px solid var(--nav-border)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.18)",
         }}
       >
         <ul className="flex items-center justify-around px-2 py-1.5">
@@ -82,7 +82,7 @@ export default function BottomNavBar() {
                   )}
                   <motion.div
                     animate={{
-                      color: isActive ? "var(--cyan)" : "rgba(255,255,255,0.38)",
+                      color: isActive ? "var(--cyan)" : "var(--nav-inactive)",
                       scale: isActive ? 1.08 : 1,
                     }}
                     transition={{ duration: 0.2 }}
@@ -92,7 +92,7 @@ export default function BottomNavBar() {
                   <span
                     className="text-[9px] tracking-wider uppercase"
                     style={{
-                      color: isActive ? "var(--cyan)" : "rgba(255,255,255,0.38)",
+                      color: isActive ? "var(--cyan)" : "var(--nav-inactive)",
                       fontFamily: "var(--font-body)",
                       fontWeight: isActive ? 500 : 400,
                     }}
