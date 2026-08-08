@@ -32,8 +32,8 @@ export function ParallaxPhoto({
         <Image
           src={src} alt={alt} fill
           className="object-cover"
-          style={{ filter: "saturate(0.75) brightness(0.82)" }}
           sizes="100vw"
+          style={{ filter: "saturate(0.75) brightness(0.82)" }}
         />
       </motion.div>
 

@@ -45,9 +45,10 @@ export default function PolaroidParallax() {
         }}
       >
         <Image
-          src="/photos/hero/DSCF0093.jpg"
+          src="/photos/hero/5.jpg"
           alt="Shobiryne portfolio"
           fill
+          sizes="100vw"
           className="object-cover"
           style={{ objectPosition: "center center" }}
           priority

@@ -21,14 +21,24 @@ function formatMonth(dateStr: string) {
 export default function KategoriPage() {
   const [mainCat,     setMainCat]     = useState<MainCat | null>(null)
   const [subCat,      setSubCat]      = useState<SubCat | null>(null)
+  const [group,       setGroup]       = useState<string | null>(null)
   const [viewerOpen,  setViewerOpen]  = useState(false)
   const [viewerIdx,   setViewerIdx]   = useState(0)
   const [viewerList,  setViewerList]  = useState<Photo[]>([])
 
-  const filtered = allCategoryPhotos.filter(p => {
+  const preGroupFiltered = allCategoryPhotos.filter(p => {
     if (!mainCat) return true
     if (p.category !== mainCat) return false
     if (subCat && p.sub !== subCat) return false
+    return true
+  })
+
+  const availableGroups = Array.from(
+    new Set(preGroupFiltered.map(p => p.group).filter((g): g is string => !!g))
+  )
+
+  const filtered = preGroupFiltered.filter(p => {
+    if (group && p.group !== group) return false
     return true
   })
 
@@ -59,6 +69,12 @@ export default function KategoriPage() {
   const selectMain = (key: MainCat) => {
     if (mainCat === key) { setMainCat(null); setSubCat(null) }
     else { setMainCat(key); setSubCat(null) }
+    setGroup(null)
+  }
+
+  const selectSub = (key: SubCat) => {
+    setSubCat(prev => prev === key ? null : key)
+    setGroup(null)
   }
 
   return (
@@ -130,7 +146,7 @@ export default function KategoriPage() {
                   <div className="flex gap-2 overflow-x-auto no-scrollbar pt-2 pb-1">
                     {/* All sub */}
                     <button
-                      onClick={() => setSubCat(null)}
+                      onClick={() => { setSubCat(null); setGroup(null) }}
                       className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200"
                       style={{
                         background: !subCat ? "var(--bg-surface-2)" : "transparent",
@@ -144,7 +160,7 @@ export default function KategoriPage() {
                     {activeDef.subs.map(s => (
                       <button
                         key={s.key}
-                        onClick={() => setSubCat(prev => prev === s.key ? null : s.key)}
+                        onClick={() => selectSub(s.key)}
                         className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
                         style={{
                           background: subCat === s.key ? "var(--bg-surface-2)" : "transparent",
@@ -153,6 +169,49 @@ export default function KategoriPage() {
                         }}
                       >
                         {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* ── Group chips (per orang / pasangan / trip) ── */}
+            <AnimatePresence>
+              {availableGroups.length > 0 && (
+                <motion.div
+                  key="groups"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar pt-2 pb-1">
+                    <button
+                      onClick={() => setGroup(null)}
+                      className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200"
+                      style={{
+                        background: !group ? "var(--bg-surface-2)" : "transparent",
+                        color:      !group ? "var(--cyan)"          : "var(--text-faint)",
+                        border:     `1px solid ${!group ? "var(--cyan)" : "var(--border)"}`,
+                      }}
+                    >
+                      Semua
+                    </button>
+
+                    {availableGroups.map(g => (
+                      <button
+                        key={g}
+                        onClick={() => setGroup(prev => prev === g ? null : g)}
+                        className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
+                        style={{
+                          background: group === g ? "var(--bg-surface-2)" : "transparent",
+                          color:      group === g ? "var(--cyan)"          : "var(--text-faint)",
+                          border:     `1px solid ${group === g ? "var(--cyan)" : "var(--border)"}`,
+                        }}
+                      >
+                        {g}
                       </button>
                     ))}
                   </div>

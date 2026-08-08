@@ -50,8 +50,9 @@ export default function AboutPage() {
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <motion.div style={{ y: heroBgY, scale: heroScale }} className="absolute inset-0 z-0">
           <Image
-            src="/photos/hero/1.jpg"
+            src="/photos/hero/5.jpg"
             alt="About hero" fill className="object-cover"
+            sizes="100vw"
             style={{ filter: "brightness(0.2) saturate(0.5)" }} priority
           />
         </motion.div>
@@ -206,7 +207,7 @@ export default function AboutPage() {
 
       {/* ── FOTO PARALLAX ────────────────────────────────────── */}
       <ParallaxPhoto
-        src="/photos/hero/4.jpg"
+        src="/photos/hero/5.jpg"
         alt="Shobiryne - Landscape"
         height="65vh"
         speed={0.25}
@@ -285,8 +286,9 @@ export default function AboutPage() {
       >
         <div className="absolute inset-0 pointer-events-none">
           <Image
-            src="/photos/hero/1.jpg"
+            src="/photos/hero/5.jpg"
             alt="" fill className="object-cover"
+            sizes="100vw"
             style={{ filter: "brightness(0.18) saturate(0.5)", mixBlendMode: "luminosity" }}
           />
         </div>
