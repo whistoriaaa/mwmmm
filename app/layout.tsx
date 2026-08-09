@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar"
 import BottomNavBar from "@/components/BottomNavBar"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { ThemeToggle } from "@/components/ThemeToggle"
+import InstallPWA from "@/components/InstallPWA"
 
 const cormorant = Cormorant_Garamond({
   subsets:  ["latin"],
@@ -74,6 +75,7 @@ export default function RootLayout({
             <ThemeToggle />
           </div>
           <main>{children}</main>
+          <InstallPWA />
           <div className="md:hidden">
             <BottomNavBar />
           </div>
