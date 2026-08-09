@@ -35,8 +35,25 @@ export default function RecentWorks() {
   const [viewerIdx,   setViewerIdx]   = useState(0)
   const [viewerList,  setViewerList]  = useState<Photo[]>([])
 
+  const PHOTOS_PER_SESSION = 4
+
   const withDate = allCategoryPhotos.filter(p => p.date)
-  const grouped = withDate.reduce<Record<string, Photo[]>>((acc, p) => {
+
+  // Cap how many photos per session (group) show up here — a full 25-photo
+  // album shouldn't dominate the homepage feed. Full set is on /kategori.
+  const bySession = withDate.reduce<Record<string, Photo[]>>((acc, p) => {
+    const key = p.group ?? `__solo_${p.id}`
+    if (!acc[key]) acc[key] = []
+    acc[key].push(p)
+    return acc
+  }, {})
+  const limited = Object.values(bySession).flatMap(session =>
+    [...session]
+      .sort((a, b) => Number(b.highlight) - Number(a.highlight))
+      .slice(0, PHOTOS_PER_SESSION)
+  )
+
+  const grouped = limited.reduce<Record<string, Photo[]>>((acc, p) => {
     const key = p.date!
     if (!acc[key]) acc[key] = []
     acc[key].push(p)
