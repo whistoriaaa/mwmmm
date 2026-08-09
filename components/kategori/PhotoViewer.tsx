@@ -228,6 +228,7 @@ export function PhotoViewer({ photos, initialIndex, onClose }: {
               alt=""
               width={photo.w}
               height={photo.h}
+              sizes="100vw"
               className="object-contain"
               style={{
                 maxWidth:  "100vw",

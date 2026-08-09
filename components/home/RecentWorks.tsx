@@ -126,29 +126,19 @@ export default function RecentWorks() {
                       src={photo.src}
                       alt=""
                       fill
+                      sizes="(min-width: 768px) 298px, 50vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       loading={mi === 0 && idx < 4 ? "eager" : "lazy"}
                     />
 
-                    {/* Overlay */}
+                    {/* Info badge — small, always visible (works on touch, no hover needed) */}
                     <div
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3"
-                      style={{ background: "linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%)" }}
+                      className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded"
+                      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(3px)" }}
                     >
-                      <div
-                        className="self-end text-[9px] tracking-wider uppercase px-2 py-0.5 rounded-lg"
-                        style={{
-                          background: "rgba(0,0,0,0.55)",
-                          backdropFilter: "blur(6px)",
-                          color: "var(--cyan)",
-                          border: "1px solid rgba(34,179,208,0.3)",
-                        }}
-                      >
-                        {formatMonth(monthKey)}
-                      </div>
                       <span
-                        className="text-[10px] tracking-widest uppercase"
-                        style={{ color: "rgba(255,255,255,0.75)" }}
+                        className="text-[7px] tracking-wider uppercase leading-none whitespace-nowrap"
+                        style={{ color: "rgba(255,255,255,0.85)" }}
                       >
                         {photoLabel(photo)}
                       </span>

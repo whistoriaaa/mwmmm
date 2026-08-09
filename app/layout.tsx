@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google"
+import { Cormorant_Garamond, Plus_Jakarta_Sans, Dancing_Script } from "next/font/google"
 import "./globals.css"
 import Navbar from "@/components/Navbar"
 import BottomNavBar from "@/components/BottomNavBar"
@@ -19,6 +19,13 @@ const jakarta = Plus_Jakarta_Sans({
   weight:   ["300", "400", "500", "600", "700"],
   style:    ["normal", "italic"],
   variable: "--font-body",
+  display:  "swap",
+})
+
+const dancingScript = Dancing_Script({
+  subsets:  ["latin"],
+  weight:   ["600"],
+  variable: "--font-dancing",
   display:  "swap",
 })
 
@@ -49,16 +56,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${cormorant.variable} ${jakarta.variable} ${dancingScript.variable}`} suppressHydrationWarning>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Shobiryne" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap"
-          rel="stylesheet"
-        />
         {/* Cegah flash saat load — baca localStorage sebelum React hydrate */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();` }} />
       </head>

@@ -21,5 +21,5 @@ export const TECH_BOTTOM = ["EV +0.3", "AWB", "sRGB", "JPEG+RAW", "AF-S", "±0",
 export const TECH_LEFT   = ["f/1.8", "ISO 400", "1/500s", "35mm", "RAW", "EV 0", "AWB", "f/2.8", "ISO 200", "1/250s", "sRGB", "AF-S"]
 export const TECH_RIGHT  = ["JPEG", "f/1.4", "ISO 800", "1/125s", "50mm", "RAW", "EV -0.3", "AWB", "f/4.0", "ISO 100", "1/1000s", "TTL"]
 
-export const handFont = "'Dancing Script', 'Segoe Script', cursive"
+export const handFont = "var(--font-dancing), 'Segoe Script', cursive"
 export const monoFont = "'Courier New', Courier, monospace"

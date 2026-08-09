@@ -18,6 +18,29 @@ function formatMonth(dateStr: string) {
   return `${MONTHS[month] ?? month} ${year}`
 }
 
+function photoInfoLabel(photo: Photo): string | null {
+  const subLabel = photo.sub
+    ? categoryDefs.flatMap(c => c.subs ?? []).find(s => s.key === photo.sub)?.label
+    : null
+  if (subLabel && photo.group) return `${subLabel} — ${photo.group}`
+  return subLabel ?? photo.group ?? null
+}
+
+function PhotoInfoBadge({ photo }: { photo: Photo }) {
+  const label = photoInfoLabel(photo)
+  if (!label) return null
+  return (
+    <div
+      className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded"
+      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(3px)" }}
+    >
+      <span className="text-[7px] tracking-wider uppercase leading-none whitespace-nowrap" style={{ color: "rgba(255,255,255,0.85)" }}>
+        {label}
+      </span>
+    </div>
+  )
+}
+
 export default function KategoriPage() {
   const [mainCat,     setMainCat]     = useState<MainCat | null>(null)
   const [subCat,      setSubCat]      = useState<SubCat | null>(null)
@@ -280,9 +303,11 @@ export default function KategoriPage() {
                               alt=""
                               width={photo.w}
                               height={photo.h}
+                              sizes="50vw"
                               className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
                               loading={mi === 0 && idx < 6 ? "eager" : "lazy"}
                             />
+                            <PhotoInfoBadge photo={photo} />
                           </div>
                         ))}
                       </div>
@@ -311,9 +336,11 @@ export default function KategoriPage() {
                             alt=""
                             width={photo.w}
                             height={photo.h}
+                            sizes="50vw"
                             className="w-full h-auto object-cover"
                             loading={idx < 6 ? "eager" : "lazy"}
                           />
+                          <PhotoInfoBadge photo={photo} />
                         </div>
                       ))}
                     </div>
@@ -344,22 +371,11 @@ export default function KategoriPage() {
                         alt=""
                         width={photo.w}
                         height={photo.h}
+                        sizes="50vw"
                         className="w-full h-auto object-cover"
                         loading={idx < 8 ? "eager" : "lazy"}
                       />
-                      {/* Sub-label overlay */}
-                      {photo.sub && (
-                        <div
-                          className="absolute bottom-0 left-0 right-0 px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)" }}
-                        >
-                          <span className="text-[9px] tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.7)" }}>
-                            {categoryDefs
-                              .flatMap(c => c.subs ?? [])
-                              .find(s => s.key === photo.sub)?.label}
-                          </span>
-                        </div>
-                      )}
+                      <PhotoInfoBadge photo={photo} />
                     </motion.div>
                   ))}
                 </AnimatePresence>
