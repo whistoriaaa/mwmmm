@@ -199,8 +199,7 @@ const rawPhotos: Photo[] = [
   { id: 110, src: "/photos/portrait/personal/rizkika/11.jpg", w: 2826, h: 3532, category: "portrait", sub: "personal", group: "Rizkika", highlight: false },
   { id: 111, src: "/photos/portrait/personal/rizkika/12.jpg", w: 2746, h: 3432, category: "portrait", sub: "personal", group: "Rizkika", highlight: false },
   // portrait/fashionis
-  { id: 112, src: "/photos/portrait/fashionis/1.jpg", w: 3341, h: 5941, category: "portrait", sub: "fashionis", highlight: true },
-  { id: 113, src: "/photos/portrait/fashionis/2.jpg", w: 2646, h: 3528, category: "portrait", sub: "fashionis", highlight: false },
+  { id: 113, src: "/photos/portrait/fashionis/2.jpg", w: 2646, h: 3528, category: "portrait", sub: "fashionis", highlight: true },
   { id: 114, src: "/photos/portrait/fashionis/3.jpg", w: 2368, h: 3545, category: "portrait", sub: "fashionis", highlight: false },
   { id: 115, src: "/photos/portrait/fashionis/4.jpg", w: 2832, h: 4240, category: "portrait", sub: "fashionis", highlight: false },
   { id: 116, src: "/photos/portrait/fashionis/5.jpg", w: 2719, h: 4071, category: "portrait", sub: "fashionis", highlight: false },
