@@ -19,11 +19,11 @@ function formatMonth(dateStr: string) {
 }
 
 function photoInfoLabel(photo: Photo): string | null {
+  if (photo.group) return photo.group
   const subLabel = photo.sub
     ? categoryDefs.flatMap(c => c.subs ?? []).find(s => s.key === photo.sub)?.label
     : null
-  if (subLabel && photo.group) return `${subLabel} — ${photo.group}`
-  return subLabel ?? photo.group ?? null
+  return subLabel ?? null
 }
 
 function PhotoInfoBadge({ photo }: { photo: Photo }) {
@@ -31,10 +31,10 @@ function PhotoInfoBadge({ photo }: { photo: Photo }) {
   if (!label) return null
   return (
     <div
-      className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded"
+      className="absolute bottom-1 right-1 max-w-[60%] px-1.5 py-0.5 rounded"
       style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(3px)" }}
     >
-      <span className="text-[7px] tracking-wider uppercase leading-none whitespace-nowrap" style={{ color: "rgba(255,255,255,0.85)" }}>
+      <span className="block text-[7px] tracking-wider uppercase leading-none whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: "rgba(255,255,255,0.85)" }}>
         {label}
       </span>
     </div>

@@ -22,6 +22,7 @@ function formatMonth(dateStr: string) {
 const allSubDefs = categoryDefs.flatMap(c => c.subs ?? [])
 
 function photoLabel(photo: Photo): string {
+  if (photo.group) return photo.group
   if (photo.sub) {
     return allSubDefs.find(s => s.key === photo.sub)?.label ?? photo.sub
   }
@@ -133,11 +134,11 @@ export default function RecentWorks() {
 
                     {/* Info badge — small, always visible (works on touch, no hover needed) */}
                     <div
-                      className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded"
+                      className="absolute bottom-1 right-1 max-w-[60%] px-1.5 py-0.5 rounded"
                       style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(3px)" }}
                     >
                       <span
-                        className="text-[7px] tracking-wider uppercase leading-none whitespace-nowrap"
+                        className="block text-[7px] tracking-wider uppercase leading-none whitespace-nowrap overflow-hidden text-ellipsis"
                         style={{ color: "rgba(255,255,255,0.85)" }}
                       >
                         {photoLabel(photo)}
