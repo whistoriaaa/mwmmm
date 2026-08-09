@@ -76,19 +76,19 @@ export const categoryDefs: CategoryDef[] = [
  * kelompok "Tanpa tanggal" di halaman kategori.
  */
 export const sessionDates: Record<string, string> = {
-  "Angel":              "",
-  "Aira":                "",
-  "Ayu":                 "",
-  "Fatma":               "",
-  "Shofi":               "",
-  "Fira dan Rikha":      "",
-  "Rizkika":             "",
-  "Dhoni & Syahlu":      "",
-  "Faroid & Wife":       "",
-  "Fendra & Wife":       "",
-  "Indra & Dewi":        "",
-  "Trip Kondang Merak":  "",
-  "Trip Rivertubing":    "",
+  "Angel":              "2026-04",
+  "Aira":                "2026-05",
+  "Ayu":                 "2026-05",
+  "Fatma":               "2026-02",
+  "Shofi":               "2026-06",
+  "Fira dan Rikha":      "2026-03",
+  "Rizkika":             "2026-05",
+  "Dhoni & Syahlu":      "2026-02",
+  "Faroid & Wife":       "2026-05",
+  "Fendra & Wife":       "2026-05",
+  "Indra & Dewi":        "2025-11",
+  "Trip Kondang Merak":  "2026-07",
+  "Trip Rivertubing":    "2025-07",
 }
 
 /**
