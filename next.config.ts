@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
     root: projectRoot,
   },
   outputFileTracingRoot: projectRoot,
+  // paket native / berat — jangan di-bundle ke server output
+  serverExternalPackages: ["sharp", "@libsql/client", "bcryptjs"],
   images: {
     remotePatterns: [
       {

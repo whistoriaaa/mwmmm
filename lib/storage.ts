@@ -14,7 +14,6 @@ import {
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
-  DeleteObjectsCommand,
   ListObjectsV2Command,
   HeadObjectCommand,
   type ListObjectsV2CommandOutput,
@@ -103,16 +102,15 @@ export async function deleteObject(path: string): Promise<void> {
   await s3().send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: toKey(path) }))
 }
 
+/**
+ * Hapus banyak objek. Cloudeka/Ceph menolak DeleteObjects batch (butuh
+ * Content-MD5 yang tak dikirim SDK), jadi dihapus satu-satu, paralel
+ * dengan batas konkurensi.
+ */
 export async function deleteObjects(paths: string[]): Promise<void> {
-  if (paths.length === 0) return
-  for (let i = 0; i < paths.length; i += 1000) {
-    const chunk = paths.slice(i, i + 1000)
-    await s3().send(
-      new DeleteObjectsCommand({
-        Bucket: S3_BUCKET,
-        Delete: { Objects: chunk.map(p => ({ Key: toKey(p) })) },
-      }),
-    )
+  const CONCURRENCY = 8
+  for (let i = 0; i < paths.length; i += CONCURRENCY) {
+    await Promise.all(paths.slice(i, i + CONCURRENCY).map((p) => deleteObject(p)))
   }
 }
 
