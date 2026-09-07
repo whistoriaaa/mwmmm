@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react"
 import Image from "next/image"
 import { categoryDefs, allCategoryPhotos, type MainCat, type SubCat, type Photo } from "@/data/categories"
 import { PhotoViewer } from "@/components/kategori/PhotoViewer"
-import { GroupCard, type GroupCardData } from "@/components/kategori/GroupCard"
+import { CategoryCard } from "@/components/kategori/CategoryCard"
 
 const MONTHS: Record<string, string> = {
   "01": "Januari", "02": "Februari", "03": "Maret",
@@ -19,12 +19,36 @@ function formatMonth(dateStr: string) {
   return `${MONTHS[month] ?? month} ${year}`
 }
 
+function subLabelOf(key?: SubCat): string | null {
+  return key
+    ? categoryDefs.flatMap(c => c.subs ?? []).find(s => s.key === key)?.label ?? null
+    : null
+}
+
+/** Ambil hingga n foto preview, disebar merata antar sub/sesi, highlight didahulukan */
+function pickPreview(photos: Photo[], n = 4): Photo[] {
+  const buckets = new Map<string, Photo[]>()
+  for (const p of photos) {
+    const k = `${p.sub ?? ""}|${p.group ?? ""}`
+    if (!buckets.has(k)) buckets.set(k, [])
+    buckets.get(k)!.push(p)
+  }
+  const lists = [...buckets.values()].map(arr =>
+    [...arr].sort((a, b) => (b.highlight ? 1 : 0) - (a.highlight ? 1 : 0))
+  )
+  const out: Photo[] = []
+  let i = 0
+  while (out.length < n && lists.some(l => l.length)) {
+    const l = lists[i % lists.length]
+    if (l.length) out.push(l.shift()!)
+    i++
+  }
+  return out
+}
+
 function photoInfoLabel(photo: Photo): string | null {
   if (photo.group) return photo.group
-  const subLabel = photo.sub
-    ? categoryDefs.flatMap(c => c.subs ?? []).find(s => s.key === photo.sub)?.label
-    : null
-  return subLabel ?? null
+  return subLabelOf(photo.sub)
 }
 
 function PhotoInfoBadge({ photo }: { photo: Photo }) {
@@ -42,58 +66,100 @@ function PhotoInfoBadge({ photo }: { photo: Photo }) {
   )
 }
 
+type Level = "mains" | "subs" | "sessions" | "photos"
+
 export default function KategoriPage() {
-  const [mainCat,     setMainCat]     = useState<MainCat | null>(null)
-  const [subCat,      setSubCat]      = useState<SubCat | null>(null)
-  const [group,       setGroup]       = useState<string | null>(null)
-  const [viewerOpen,  setViewerOpen]  = useState(false)
-  const [viewerIdx,   setViewerIdx]   = useState(0)
-  const [viewerList,  setViewerList]  = useState<Photo[]>([])
+  const [mainCat,    setMainCat]    = useState<MainCat | null>(null)
+  const [subCat,     setSubCat]     = useState<SubCat | null>(null)
+  const [group,      setGroup]      = useState<string | null>(null)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIdx,  setViewerIdx]  = useState(0)
+  const [viewerList, setViewerList] = useState<Photo[]>([])
 
-  const preGroupFiltered = allCategoryPhotos.filter(p => {
-    if (!mainCat) return true
-    if (p.category !== mainCat) return false
-    if (subCat && p.sub !== subCat) return false
-    return true
-  })
-
-  const availableGroups = Array.from(
-    new Set(preGroupFiltered.map(p => p.group).filter((g): g is string => !!g))
-  )
-
-  const filtered = preGroupFiltered.filter(p => {
-    if (group && p.group !== group) return false
-    return true
-  })
+  const openViewer = (list: Photo[], idx: number) => {
+    setViewerList(list)
+    setViewerIdx(idx)
+    setViewerOpen(true)
+  }
 
   const activeDef = categoryDefs.find(c => c.key === mainCat)
 
-  const subLabelOf = (key?: SubCat) =>
-    key ? categoryDefs.flatMap(c => c.subs ?? []).find(s => s.key === key)?.label ?? null : null
-
-  // ── Kartu sesi (menggantikan chip sub-kategori paling bawah) ──
-  const groupCards: GroupCardData[] = availableGroups.map(name => {
-    const photos  = preGroupFiltered.filter(p => p.group === name)
-    const ranked  = [...photos].sort((a, b) => (b.highlight ? 1 : 0) - (a.highlight ? 1 : 0))
-    const dateStr = photos.find(p => p.date)?.date
-    return {
-      name,
-      photos,
-      preview:   ranked.slice(0, 5),
-      subLabel:  !subCat ? subLabelOf(photos[0]?.sub) : null,
-      dateLabel: dateStr ? formatMonth(dateStr) : null,
-    }
+  // Foto dalam scope navigasi saat ini
+  const scoped = allCategoryPhotos.filter(p => {
+    if (mainCat && p.category !== mainCat) return false
+    if (subCat  && p.sub      !== subCat)  return false
+    if (group   && p.group    !== group)   return false
+    return true
   })
 
-  // Foto tanpa grup dalam filter aktif (ditampilkan di bawah kartu)
-  const looseInFilter = preGroupFiltered.filter(p => !p.group)
+  // Scope tanpa filter sesi — untuk menghitung sesi & foto lepas
+  const scopedNoGroup = allCategoryPhotos.filter(p => {
+    if (mainCat && p.category !== mainCat) return false
+    if (subCat  && p.sub      !== subCat)  return false
+    return true
+  })
+  const sessionNames = Array.from(
+    new Set(scopedNoGroup.map(p => p.group).filter((g): g is string => !!g))
+  )
+  const looseInScope = scopedNoGroup.filter(p => !p.group)
 
-  // Kartu sesi hanya muncul setelah masuk ke sebuah kategori utama
-  const showGroupCards = groupCards.length > 0 && !group && mainCat !== null
+  // Tentukan tingkat tampilan
+  const level: Level =
+    group                         ? "photos"
+    : !mainCat                     ? "mains"
+    : !subCat && activeDef?.subs   ? "subs"
+    : sessionNames.length > 0      ? "sessions"
+    : "photos"
 
-  // Kelompokkan per bulan saat subcategory / sesi aktif
-  const groupedByMonth = (subCat || group)
-    ? filtered.reduce<Record<string, Photo[]>>((acc, p) => {
+  // ── Data kartu per tingkat ──
+  const mainCards = categoryDefs
+    .filter(c => allCategoryPhotos.some(p => p.category === c.key))
+    .map(c => {
+      const photos = allCategoryPhotos.filter(p => p.category === c.key)
+      const nSub   = c.subs?.filter(s => photos.some(p => p.sub === s.key)).length ?? 0
+      const nSess  = new Set(photos.map(p => p.group).filter(Boolean)).size
+      const meta   = [
+        nSub ? `${nSub} kategori` : nSess ? `${nSess} sesi` : null,
+        `${photos.length} foto`,
+      ].filter(Boolean).join(" · ")
+      return { key: c.key as string, title: c.label, meta, preview: pickPreview(photos) }
+    })
+
+  const subCards = (activeDef?.subs ?? [])
+    .map(s => ({ s, photos: allCategoryPhotos.filter(p => p.category === mainCat && p.sub === s.key) }))
+    .filter(x => x.photos.length > 0)
+    .map(({ s, photos }) => {
+      const nSess = new Set(photos.map(p => p.group).filter(Boolean)).size
+      const meta  = [nSess ? `${nSess} sesi` : null, `${photos.length} foto`].filter(Boolean).join(" · ")
+      return { key: s.key as string, title: s.label, meta, preview: pickPreview(photos) }
+    })
+
+  const sessionCards = sessionNames.map(name => {
+    const photos  = scopedNoGroup.filter(p => p.group === name)
+    const dateStr = photos.find(p => p.date)?.date
+    const meta    = [
+      `${photos.length} foto`,
+      !subCat ? subLabelOf(photos[0]?.sub) : null,
+      dateStr ? formatMonth(dateStr) : null,
+    ].filter(Boolean).join(" · ")
+    return { key: name, title: name, meta, preview: pickPreview(photos) }
+  })
+
+  const cards =
+    level === "mains"    ? mainCards :
+    level === "subs"     ? subCards  :
+    level === "sessions" ? sessionCards : []
+
+  const onCardClick = (key: string) => {
+    if      (level === "mains") { setMainCat(key as MainCat); setSubCat(null); setGroup(null) }
+    else if (level === "subs")  { setSubCat(key as SubCat);   setGroup(null) }
+    else                        { setGroup(key) }
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  // ── Grid foto (leaf) — dikelompokkan per bulan ──
+  const groupedByMonth = level === "photos"
+    ? scoped.reduce<Record<string, Photo[]>>((acc, p) => {
         const key = p.date ?? "unknown"
         if (!acc[key]) acc[key] = []
         acc[key].push(p)
@@ -104,187 +170,121 @@ export default function KategoriPage() {
   const sortedMonthKeys = groupedByMonth
     ? Object.keys(groupedByMonth).filter(k => k !== "unknown").sort().reverse()
     : []
-
   const unknownGroup = groupedByMonth?.["unknown"] ?? []
 
-  const openViewer = (list: Photo[], idx: number) => {
-    setViewerList(list)
-    setViewerIdx(idx)
-    setViewerOpen(true)
-  }
+  // ── Breadcrumb ──
+  const crumbs = [
+    { label: "Semua", onClick: () => { setMainCat(null); setSubCat(null); setGroup(null) }, active: !mainCat },
+    ...(mainCat ? [{ label: activeDef?.label ?? "", onClick: () => { setSubCat(null); setGroup(null) }, active: !subCat && !group }] : []),
+    ...(subCat  ? [{ label: subLabelOf(subCat) ?? "", onClick: () => setGroup(null), active: !group }] : []),
+    ...(group   ? [{ label: group, onClick: () => {}, active: true }] : []),
+  ]
 
-  const selectMain = (key: MainCat) => {
-    if (mainCat === key) { setMainCat(null); setSubCat(null) }
-    else { setMainCat(key); setSubCat(null) }
-    setGroup(null)
-  }
+  const countText =
+    level === "mains"    ? `${mainCards.length} kategori`
+    : level === "subs"   ? `${subCards.length} kategori · ${scopedNoGroup.length} foto`
+    : level === "sessions" ? `${sessionCards.length} sesi · ${scopedNoGroup.length} foto`
+    : `${scoped.length} foto`
 
-  const selectSub = (key: SubCat) => {
-    setSubCat(prev => prev === key ? null : key)
-    setGroup(null)
-  }
+  const renderMasonry = (list: Photo[], eager = 6) => (
+    <div style={{ columns: "2 160px", columnGap: "6px" }}>
+      {list.map((photo, idx) => (
+        <div
+          key={photo.id}
+          className="break-inside-avoid mb-1.5 rounded-lg overflow-hidden cursor-pointer relative group"
+          onClick={() => openViewer(list, idx)}
+        >
+          <Image
+            src={photo.src}
+            alt=""
+            width={photo.w}
+            height={photo.h}
+            sizes="50vw"
+            className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+            loading={idx < eager ? "eager" : "lazy"}
+          />
+          <PhotoInfoBadge photo={photo} />
+        </div>
+      ))}
+    </div>
+  )
 
   return (
     <>
-      <div
-        className="min-h-screen"
-        style={{ background: "var(--background)", paddingBottom: "96px" }}
-      >
-        {/* ── Sticky header filter ── */}
+      <div className="min-h-screen" style={{ background: "var(--background)", paddingBottom: "96px" }}>
+        {/* ── Sticky header ── */}
         <div
           className="sticky top-0 z-40"
           style={{ background: "var(--sticky-bg)", backdropFilter: "blur(24px)", borderBottom: "1px solid var(--border)" }}
         >
-          <div
-            className="px-4 md:px-8"
-            style={{ paddingTop: "calc(env(safe-area-inset-top) + 52px)" }}
-          >
+          <div className="px-4 md:px-8" style={{ paddingTop: "calc(env(safe-area-inset-top) + 52px)" }}>
             <h1
-              className="font-light italic mb-4"
+              className="font-light italic"
               style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.4rem, 5vw, 2rem)", color: "var(--gold)" }}
             >
               Kategori
             </h1>
 
-            {/* ── Main category chips ── */}
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-              {/* All */}
-              <button
-                onClick={() => { setMainCat(null); setSubCat(null) }}
-                className="flex-none px-4 py-1.5 rounded-lg text-[11px] tracking-wider uppercase transition-all duration-200"
-                style={{
-                  background:   !mainCat ? "var(--cyan)"   : "transparent",
-                  color:        !mainCat ? "#fff"           : "var(--text-muted)",
-                  border:       `1px solid ${!mainCat ? "var(--cyan)" : "var(--border)"}`,
-                  fontWeight:   !mainCat ? 600 : 400,
-                }}
-              >
-                Semua
-              </button>
-
-              {categoryDefs.map(cat => (
-                <button
-                  key={cat.key}
-                  onClick={() => selectMain(cat.key)}
-                  className="flex-none px-4 py-1.5 rounded-lg text-[11px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
-                  style={{
-                    background: mainCat === cat.key ? "var(--cyan)"  : "transparent",
-                    color:      mainCat === cat.key ? "#fff"          : "var(--text-muted)",
-                    border:     `1px solid ${mainCat === cat.key ? "var(--cyan)" : "var(--border)"}`,
-                    fontWeight: mainCat === cat.key ? 600 : 400,
-                  }}
-                >
-                  {cat.label}
-                </button>
+            {/* ── Breadcrumb ── */}
+            <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+              {crumbs.map((c, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  {i > 0 && (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  )}
+                  <button
+                    onClick={c.onClick}
+                    disabled={c.active}
+                    className="text-[11px] tracking-wider uppercase transition-colors duration-200 disabled:cursor-default"
+                    style={{ color: c.active ? "var(--cyan)" : "var(--text-muted)", fontWeight: c.active ? 600 : 400 }}
+                  >
+                    {c.label}
+                  </button>
+                </div>
               ))}
             </div>
 
-            {/* ── Sub-category chips ── */}
-            <AnimatePresence>
-              {activeDef?.subs && (
-                <motion.div
-                  key={mainCat}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar pt-2 pb-1">
-                    {/* All sub */}
-                    <button
-                      onClick={() => { setSubCat(null); setGroup(null) }}
-                      className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200"
-                      style={{
-                        background: !subCat ? "var(--bg-surface-2)" : "transparent",
-                        color:      !subCat ? "var(--gold)"          : "var(--text-faint)",
-                        border:     `1px solid ${!subCat ? "var(--gold)" : "var(--border)"}`,
-                      }}
-                    >
-                      Semua
-                    </button>
-
-                    {activeDef.subs.map(s => (
-                      <button
-                        key={s.key}
-                        onClick={() => selectSub(s.key)}
-                        className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
-                        style={{
-                          background: subCat === s.key ? "var(--bg-surface-2)" : "transparent",
-                          color:      subCat === s.key ? "var(--gold)"          : "var(--text-faint)",
-                          border:     `1px solid ${subCat === s.key ? "var(--gold)" : "var(--border)"}`,
-                        }}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* ── Sesi aktif / kembali ke daftar kartu ── */}
-            <AnimatePresence>
-              {group && (
-                <motion.div
-                  key="active-group"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
-                >
-                  <button
-                    onClick={() => setGroup(null)}
-                    className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200"
-                    style={{ background: "var(--bg-surface-2)", color: "var(--cyan)", border: "1px solid var(--cyan)" }}
-                  >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M15 18l-6-6 6-6" />
-                    </svg>
-                    {group}
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* ── Jumlah foto / sesi ── */}
+            {/* ── Jumlah ── */}
             <div className="py-2">
               <motion.span
-                key={`${showGroupCards}-${filtered.length}`}
+                key={countText}
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-[11px] tracking-wider"
                 style={{ color: "var(--text-faint)" }}
               >
-                {showGroupCards
-                  ? `${groupCards.length} sesi · ${preGroupFiltered.length} foto`
-                  : `${filtered.length} foto`}
+                {countText}
               </motion.span>
             </div>
           </div>
         </div>
 
         {/* ── Konten ── */}
-        <div className="px-2 pt-3 md:px-6">
-          {showGroupCards ? (
-            /* ── Kartu sesi (sub-kategori paling bawah) ── */
+        <div className="px-3 pt-4 md:px-6">
+          {level !== "photos" ? (
             <div>
-              <div className="grid gap-3 md:grid-cols-2 px-1">
-                {groupCards.map((card, i) => (
-                  <GroupCard
-                    key={card.name}
-                    data={card}
+              <motion.div
+                key={`${level}-${mainCat ?? ""}-${subCat ?? ""}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="grid gap-3 md:grid-cols-2"
+              >
+                {cards.map((card, i) => (
+                  <CategoryCard
+                    key={card.key}
+                    title={card.title}
+                    meta={card.meta}
+                    preview={card.preview}
                     index={i}
-                    onClick={() => {
-                      setGroup(card.name)
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    }}
+                    onClick={() => onCardClick(card.key)}
                   />
                 ))}
-              </div>
+              </motion.div>
 
-              {looseInFilter.length > 0 && (
+              {level === "sessions" && looseInScope.length > 0 && (
                 <div className="mt-9">
                   <div className="flex items-center gap-3 mb-3 px-1">
                     <span className="text-[10px] tracking-[0.4em] uppercase whitespace-nowrap" style={{ color: "var(--text-faint)" }}>
@@ -292,154 +292,53 @@ export default function KategoriPage() {
                     </span>
                     <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
                     <span className="text-[10px] tracking-wider" style={{ color: "var(--text-faint)" }}>
-                      {looseInFilter.length} foto
+                      {looseInScope.length} foto
                     </span>
                   </div>
-                  <div style={{ columns: "2 160px", columnGap: "6px" }}>
-                    {looseInFilter.map((photo, idx) => (
-                      <div
-                        key={photo.id}
-                        className="break-inside-avoid mb-1.5 rounded-lg overflow-hidden cursor-pointer relative group"
-                        onClick={() => openViewer(looseInFilter, idx)}
-                      >
-                        <Image
-                          src={photo.src}
-                          alt=""
-                          width={photo.w}
-                          height={photo.h}
-                          sizes="50vw"
-                          className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                          loading={idx < 6 ? "eager" : "lazy"}
-                        />
-                        <PhotoInfoBadge photo={photo} />
-                      </div>
-                    ))}
-                  </div>
+                  {renderMasonry(looseInScope)}
                 </div>
               )}
             </div>
-          ) : filtered.length > 0 ? (
-            (subCat || group) && groupedByMonth ? (
-              /* ── Tampilan per bulan saat subcategory / sesi dipilih ── */
-              <div>
-                {sortedMonthKeys.map((monthKey, mi) => {
-                  const monthPhotos = groupedByMonth[monthKey]
-                  return (
-                    <motion.div
-                      key={monthKey}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: mi * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                      className="mb-10"
-                    >
-                      {/* Month separator */}
-                      <div className="flex items-center gap-3 mb-3 px-1">
-                        <span
-                          className="text-[10px] tracking-[0.4em] uppercase whitespace-nowrap"
-                          style={{ color: "var(--gold)", opacity: 0.85 }}
-                        >
-                          {formatMonth(monthKey)}
-                        </span>
-                        <div
-                          className="flex-1 h-px"
-                          style={{ background: "linear-gradient(to right, rgba(211,179,102,0.25), transparent)" }}
-                        />
-                        <span className="text-[10px] tracking-wider" style={{ color: "var(--text-faint)" }}>
-                          {monthPhotos.length} foto
-                        </span>
-                      </div>
+          ) : scoped.length > 0 ? (
+            <div>
+              {sortedMonthKeys.map((monthKey, mi) => {
+                const monthPhotos = groupedByMonth![monthKey]
+                return (
+                  <motion.div
+                    key={monthKey}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: mi * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                    className="mb-10"
+                  >
+                    <div className="flex items-center gap-3 mb-3 px-1">
+                      <span className="text-[10px] tracking-[0.4em] uppercase whitespace-nowrap" style={{ color: "var(--gold)", opacity: 0.85 }}>
+                        {formatMonth(monthKey)}
+                      </span>
+                      <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, rgba(211,179,102,0.25), transparent)" }} />
+                      <span className="text-[10px] tracking-wider" style={{ color: "var(--text-faint)" }}>
+                        {monthPhotos.length} foto
+                      </span>
+                    </div>
+                    {renderMasonry(monthPhotos, mi === 0 ? 6 : 0)}
+                  </motion.div>
+                )
+              })}
 
-                      {/* Masonry grid per bulan */}
-                      <div style={{ columns: "2 160px", columnGap: "6px" }}>
-                        {monthPhotos.map((photo, idx) => (
-                          <div
-                            key={photo.id}
-                            className="break-inside-avoid mb-1.5 rounded-lg overflow-hidden cursor-pointer relative group"
-                            onClick={() => openViewer(monthPhotos, idx)}
-                          >
-                            <Image
-                              src={photo.src}
-                              alt=""
-                              width={photo.w}
-                              height={photo.h}
-                              sizes="50vw"
-                              className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                              loading={mi === 0 && idx < 6 ? "eager" : "lazy"}
-                            />
-                            <PhotoInfoBadge photo={photo} />
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )
-                })}
-
-                {/* Foto tanpa tanggal */}
-                {unknownGroup.length > 0 && (
-                  <div className="mb-10">
+              {unknownGroup.length > 0 && (
+                <div className="mb-10">
+                  {sortedMonthKeys.length > 0 && (
                     <div className="flex items-center gap-3 mb-3 px-1">
                       <span className="text-[10px] tracking-[0.4em] uppercase" style={{ color: "var(--text-faint)" }}>
                         Tanpa tanggal
                       </span>
-                      <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.06)" }} />
+                      <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
                     </div>
-                    <div style={{ columns: "2 160px", columnGap: "6px" }}>
-                      {unknownGroup.map((photo, idx) => (
-                        <div
-                          key={photo.id}
-                          className="break-inside-avoid mb-1.5 rounded-lg overflow-hidden cursor-pointer relative group"
-                          onClick={() => openViewer(unknownGroup, idx)}
-                        >
-                          <Image
-                            src={photo.src}
-                            alt=""
-                            width={photo.w}
-                            height={photo.h}
-                            sizes="50vw"
-                            className="w-full h-auto object-cover"
-                            loading={idx < 6 ? "eager" : "lazy"}
-                          />
-                          <PhotoInfoBadge photo={photo} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* ── Masonry flat (semua / kategori utama saja) ── */
-              <motion.div
-                layout
-                style={{ columns: "2 160px", columnGap: "6px" }}
-              >
-                <AnimatePresence>
-                  {filtered.map((photo, idx) => (
-                    <motion.div
-                      key={photo.id}
-                      layout
-                      initial={{ opacity: 0, scale: 0.94 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-                      className="break-inside-avoid mb-1.5 rounded-lg overflow-hidden cursor-pointer relative group"
-                      onClick={() => openViewer(filtered, idx)}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      <Image
-                        src={photo.src}
-                        alt=""
-                        width={photo.w}
-                        height={photo.h}
-                        sizes="50vw"
-                        className="w-full h-auto object-cover"
-                        loading={idx < 8 ? "eager" : "lazy"}
-                      />
-                      <PhotoInfoBadge photo={photo} />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
-            )
+                  )}
+                  {renderMasonry(unknownGroup)}
+                </div>
+              )}
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth="1.2" strokeLinecap="round">
