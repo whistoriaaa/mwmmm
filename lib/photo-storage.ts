@@ -1,7 +1,7 @@
 import "server-only"
 import { eq, sql } from "drizzle-orm"
 import { db } from "@/lib/db"
-import { photos } from "@/lib/db/schema"
+import { photos, sessions } from "@/lib/db/schema"
 import { uploadObject, deleteObjects } from "@/lib/storage"
 import { processPhoto, variantMeta, contentTypeFor } from "@/lib/images"
 import { shortId } from "@/lib/id"
@@ -100,4 +100,28 @@ export async function deletePhoto(photoId: number): Promise<void> {
     console.error(`deletePhoto: gagal hapus sebagian objek foto ${photoId}:`, e)
   }
   await db.delete(photos).where(eq(photos.id, photoId))
+}
+
+/** Hapus sesi + seluruh fotonya (objek S3 + baris DB). */
+export async function deleteSession(sessionId: number): Promise<void> {
+  const rows = await db.query.photos.findMany({ where: eq(photos.sessionId, sessionId) })
+  const keys = rows.flatMap((r) => [
+    ...r.variants.map((v) => `${r.storageDir}/${v.w}.${v.fmt}`),
+    `${r.storageDir}/original.${r.origFormat}`,
+  ])
+  try {
+    await deleteObjects(keys)
+  } catch (e) {
+    console.error(`deleteSession: gagal hapus sebagian objek sesi ${sessionId}:`, e)
+  }
+  await db.delete(sessions).where(eq(sessions.id, sessionId)) // photos cascade
+}
+
+/** Simpan urutan baru foto. */
+export async function reorderPhotos(orderedIds: number[]): Promise<void> {
+  await Promise.all(
+    orderedIds.map((id, i) =>
+      db.update(photos).set({ sortOrder: i }).where(eq(photos.id, id)),
+    ),
+  )
 }
