@@ -1,6 +1,6 @@
 /**
  * Cek koneksi & perilaku object storage.
- *   node --env-file=.env.local scripts/storage-check.ts
+ *   npm run storage:check
  */
 import {
   listPrefix,
@@ -10,53 +10,48 @@ import {
   presignedGetUrl,
   publicUrl,
   S3_BUCKET,
+  S3_PREFIX,
 } from "../lib/storage.ts"
 
 async function main() {
-  console.log(`Bucket: ${S3_BUCKET}\n`)
+  console.log(`Bucket: ${S3_BUCKET}   Prefix: ${S3_PREFIX || "(none)"}\n`)
 
-  // 1. List root
-  console.log("→ List root (delimiter '/')")
+  console.log("→ List root app (delimiter '/')")
   const root = await listPrefix("", { delimiter: "/" })
   console.log("  folders:", root.folders.length ? root.folders : "(kosong)")
-  console.log("  objects:", root.objects.slice(0, 10).map(o => `${o.key} (${o.size}b)`))
+  console.log("  objects:", root.objects.slice(0, 10).map(o => `${o.path} (${o.size}b)`))
 
-  // 2. Upload objek uji
-  const key = `_healthcheck/${Date.now()}.txt`
-  console.log(`\n→ Upload ${key}`)
+  const path = `_healthcheck/${Date.now()}.txt`
+  console.log(`\n→ Upload ${path}`)
   await uploadObject({
-    key,
+    path,
     body: `ok ${new Date().toISOString()}`,
     contentType: "text/plain",
     cacheControl: "no-store",
   })
   console.log("  ok")
 
-  // 3. Head
-  console.log(`\n→ objectExists(${key}) =`, await objectExists(key))
+  console.log(`\n→ objectExists(${path}) =`, await objectExists(path))
 
-  // 4. Presigned GET
-  const signed = await presignedGetUrl(key, 120)
+  const signed = await presignedGetUrl(path, 120)
   const rSigned = await fetch(signed)
   console.log(`\n→ Presigned GET: HTTP ${rSigned.status} — "${(await rSigned.text()).slice(0, 40)}"`)
 
-  // 5. Public URL (apakah bucket public-read?)
   try {
-    const pub = publicUrl(key)
+    const pub = publicUrl(path)
     const rPub = await fetch(pub)
     console.log(`→ Public GET (${pub}): HTTP ${rPub.status}`)
     console.log(
       rPub.ok
-        ? "  ✓ Bucket PUBLIC-READ — bisa dipakai langsung sebagai src <Image>."
-        : "  ✗ Bukan public-read — perlu serve lewat route Next / presigned / CDN.",
+        ? "  ✓ Public-read — bisa dipakai langsung sebagai src <Image>."
+        : "  ✗ Bukan public-read — baca lewat route handler Next / presigned / CDN.",
     )
   } catch (e) {
     console.log("→ Public URL skip:", (e as Error).message)
   }
 
-  // 6. Cleanup
-  await deleteObject(key)
-  console.log(`\n→ Hapus ${key} — objectExists =`, await objectExists(key))
+  await deleteObject(path)
+  console.log(`\n→ Hapus ${path} — objectExists =`, await objectExists(path))
   console.log("\nSelesai.")
 }
 
