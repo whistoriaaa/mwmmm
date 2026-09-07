@@ -1,3 +1,4 @@
+import { revalidateSite } from "@/lib/revalidate"
 import { NextResponse } from "next/server"
 import { and, eq, ne } from "drizzle-orm"
 import { requireAdmin } from "@/lib/auth/guard"
@@ -84,6 +85,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   }
 
   await db.update(sessions).set(patch).where(eq(sessions.id, id))
+  revalidateSite()
   return NextResponse.json({ ok: true })
 }
 
@@ -94,5 +96,6 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   if (id == null) return NextResponse.json({ error: "id tidak valid" }, { status: 400 })
 
   await deleteSession(id)
+  revalidateSite()
   return NextResponse.json({ ok: true })
 }

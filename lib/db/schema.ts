@@ -120,6 +120,8 @@ export const photos = sqliteTable(
     }),
     storageDir: text("storage_dir").notNull(), // "portrait/aira/kx7f2a"
     origFormat: text("orig_format").notNull(), // "jpg"
+    /** asal file saat migrasi dari public/ — untuk idempotensi & jejak */
+    sourcePath: text("source_path"),
     width: integer("width").notNull(),
     height: integer("height").notNull(),
     variants: text("variants", { mode: "json" }).$type<PhotoVariant[]>().notNull(),
@@ -133,6 +135,7 @@ export const photos = sqliteTable(
   (t) => [
     index("photos_session").on(t.sessionId),
     index("photos_category").on(t.categoryId, t.subcategoryId),
+    unique("photos_source_path").on(t.sourcePath),
   ],
 )
 

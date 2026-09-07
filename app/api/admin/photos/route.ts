@@ -1,3 +1,4 @@
+import { revalidateSite } from "@/lib/revalidate"
 import { NextResponse, type NextRequest } from "next/server"
 import { eq } from "drizzle-orm"
 import { requireAdmin } from "@/lib/auth/guard"
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest) {
       sessionId: sessionId ?? null,
       sessionSlug: sess?.slug ?? null,
     })
+    revalidateSite()
     return NextResponse.json({
       sessionId: sessionId ?? null,
       sessionTitle: sess?.title ?? null,

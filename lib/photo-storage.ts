@@ -32,6 +32,8 @@ export interface IngestParams {
   sessionSlug?: string | null
   alt?: string | null
   highlight?: boolean
+  sortOrder?: number
+  sourcePath?: string | null
 }
 
 /**
@@ -59,10 +61,14 @@ export async function ingestPhoto(p: IngestParams) {
     }),
   ])
 
-  const [nextOrder] = await db
-    .select({ v: sql<number>`coalesce(max(${photos.sortOrder}), -1) + 1` })
-    .from(photos)
-    .where(p.sessionId ? eq(photos.sessionId, p.sessionId) : eq(photos.categoryId, p.categoryId))
+  let sortOrder = p.sortOrder
+  if (sortOrder === undefined) {
+    const [next] = await db
+      .select({ v: sql<number>`coalesce(max(${photos.sortOrder}), -1) + 1` })
+      .from(photos)
+      .where(p.sessionId ? eq(photos.sessionId, p.sessionId) : eq(photos.categoryId, p.categoryId))
+    sortOrder = next?.v ?? 0
+  }
 
   const [row] = await db
     .insert(photos)
@@ -72,13 +78,14 @@ export async function ingestPhoto(p: IngestParams) {
       subcategoryId: p.subcategoryId ?? null,
       storageDir: dir,
       origFormat: processed.origFormat,
+      sourcePath: p.sourcePath ?? null,
       width: processed.width,
       height: processed.height,
       variants: variantMeta(processed.variants),
       blurDataUrl: processed.blurDataUrl,
       alt: p.alt ?? null,
       highlight: p.highlight ?? false,
-      sortOrder: nextOrder?.v ?? 0,
+      sortOrder,
     })
     .returning()
 

@@ -1,3 +1,4 @@
+import { revalidateSite } from "@/lib/revalidate"
 import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/auth/guard"
 import { reorderPhotos } from "@/lib/photo-storage"
@@ -15,5 +16,6 @@ export async function POST(req: Request) {
   if (ids.length === 0) return NextResponse.json({ error: "orderedIds kosong" }, { status: 400 })
 
   await reorderPhotos(ids)
+  revalidateSite()
   return NextResponse.json({ ok: true })
 }

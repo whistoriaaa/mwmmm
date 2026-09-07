@@ -1,8 +1,8 @@
 "use client"
 
-import Image from "next/image"
 import { motion } from "motion/react"
-import type { Photo } from "@/data/categories"
+import { SitePicture } from "@/components/site/site-picture"
+import type { SitePhoto } from "@/lib/queries/site-types"
 
 /**
  * Kartu navigasi kategori — persegi panjang rounded, background berisi
@@ -17,7 +17,7 @@ export function CategoryCard({ title, meta, preview, onClick, index = 0 }: {
   title: string
   meta?: string
   /** hingga 4 foto untuk background kartu */
-  preview: Photo[]
+  preview: SitePhoto[]
   onClick: () => void
   index?: number
 }) {
@@ -46,14 +46,12 @@ export function CategoryCard({ title, meta, preview, onClick, index = 0 }: {
         <div className="absolute inset-0 flex" style={{ background: "var(--bg-surface-2)" }}>
           {preview.slice(0, 4).map((p, i) => (
             <div key={p.id} className="relative flex-1 overflow-hidden">
-              <Image
-                src={p.src}
-                alt=""
-                fill
+              <SitePicture
+                photo={p}
                 sizes="(min-width: 768px) 13vw, 25vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                priority={index < 3}
+                className="absolute inset-0 h-full w-full transition-transform duration-700 ease-out group-hover:scale-105"
                 style={{ transitionDelay: `${i * 35}ms` }}
-                loading={index < 3 ? "eager" : "lazy"}
               />
             </div>
           ))}

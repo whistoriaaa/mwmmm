@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "motion/react"
-import Image from "next/image"
-import type { Photo } from "@/data/categories"
+import { pictureSources } from "@/lib/img"
+import type { SitePhoto } from "@/lib/queries/site-types"
 
 export function PhotoViewer({ photos, initialIndex, onClose }: {
-  photos: Photo[]
+  photos: SitePhoto[]
   initialIndex: number
   onClose: () => void
 }) {
@@ -223,24 +223,36 @@ export function PhotoViewer({ photos, initialIndex, onClose }: {
               WebkitUserSelect:"none",
             }}
           >
-            <Image
-              src={photo.src}
-              alt=""
-              width={photo.w}
-              height={photo.h}
-              sizes="100vw"
-              className="object-contain"
-              style={{
-                maxWidth:  "100vw",
-                maxHeight: "100svh",
-                width:     "auto",
-                height:    "auto",
-                display:   "block",
-                pointerEvents: "none",
-              }}
-              priority
-              draggable={false}
-            />
+            {(() => {
+              const s = pictureSources(photo.storageDir, photo.variants)
+              return (
+                <picture>
+                  {s.avif && <source type="image/avif" srcSet={s.avif} sizes="100vw" />}
+                  {s.webp && <source type="image/webp" srcSet={s.webp} sizes="100vw" />}
+                  <img
+                    src={s.largest.src}
+                    alt=""
+                    width={photo.width}
+                    height={photo.height}
+                    decoding="async"
+                    draggable={false}
+                    style={{
+                      maxWidth: "100vw",
+                      maxHeight: "100svh",
+                      width: "auto",
+                      height: "auto",
+                      display: "block",
+                      objectFit: "contain",
+                      pointerEvents: "none",
+                      backgroundImage: `url("${photo.blurDataUrl}")`,
+                      backgroundSize: "contain",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                    }}
+                  />
+                </picture>
+              )
+            })()}
           </motion.div>
         </AnimatePresence>
       </div>
