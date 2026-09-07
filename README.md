@@ -84,8 +84,25 @@ Metadata (dimensi, daftar varian, blur) disimpan di DB. Bucket private → disaj
 `/api/img/[...path]` dengan cache `immutable` 1 tahun. `next/image` tidak dipakai
 untuk foto CMS (varian sudah pra-generate).
 
-## Deploy
+## Deploy (VPS + Docker)
 
-Target: VPS + Docker (menyusul). Yang perlu di produksi: env di atas, `npm ci`,
-`npm run db:migrate && npm run db:seed`, `npm run build`, `npm start`; reverse
-proxy (nginx) + TLS; `.data/cms.db` persisten (volume).
+```bash
+# di VPS, dalam folder repo
+cp .env.example .env && nano .env          # isi kredensial produksi
+docker compose build
+docker compose run --rm app node scripts/db-migrate.ts   # skema
+docker compose run --rm -e ADMIN_PASSWORD=… app node scripts/db-seed.ts   # sekali
+docker compose up -d
+```
+
+- App di `127.0.0.1:3000`; taruh reverse proxy + TLS di depan
+  (`deploy/nginx.conf.example`).
+- `.data/cms.db` di volume `cms-data` (persisten). Backup = `docker compose
+  cp app:/app/.data/cms.db ./backup/`.
+- Foto ada di object storage, bukan di image/volume.
+- Update: `git pull && docker compose build && docker compose run --rm app
+  node scripts/db-migrate.ts && docker compose up -d`.
+- `next.config.ts` pakai `output: "standalone"` → image ramping.
+
+> Belum diuji terhadap stack Docker VPS yang sudah ada — sesuaikan port /
+> jaringan / proxy bila perlu.

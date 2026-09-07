@@ -20,6 +20,8 @@ const projectRoot = (() => {
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
+  // image ramping Docker: server.js mandiri + node_modules yang di-trace
+  output: "standalone",
   turbopack: {
     root: projectRoot,
   },

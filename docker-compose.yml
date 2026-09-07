@@ -1,0 +1,27 @@
+# Deploy di VPS:
+#   docker compose build
+#   docker compose run --rm app node scripts/db-migrate.ts   # sekali / tiap update skema
+#   docker compose up -d
+#
+# Env: buat .env di sebelah file ini (lihat .env.example). JANGAN commit.
+# Reverse proxy (nginx/Caddy/Traefik) → http://127.0.0.1:3000, TLS di sana.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: file:/app/.data/cms.db
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - cms-data:/app/.data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  cms-data:
