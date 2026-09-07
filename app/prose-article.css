@@ -1,0 +1,81 @@
+/* Gaya isi artikel — dipakai editor CMS & halaman /cerita publik. */
+.prose-article {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.prose-article > * + * {
+  margin-top: 1.1em;
+}
+.prose-article h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 2em;
+}
+.prose-article h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 1.6em;
+}
+.prose-article h2:first-child,
+.prose-article h3:first-child {
+  margin-top: 0;
+}
+.prose-article p:empty {
+  min-height: 1.75em;
+}
+.prose-article a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-article ul,
+.prose-article ol {
+  padding-left: 1.4em;
+}
+.prose-article ul {
+  list-style: disc;
+}
+.prose-article ol {
+  list-style: decimal;
+}
+.prose-article li + li {
+  margin-top: 0.35em;
+}
+.prose-article blockquote {
+  border-left: 3px solid currentColor;
+  padding-left: 1em;
+  opacity: 0.75;
+  font-style: italic;
+}
+.prose-article hr {
+  border: 0;
+  border-top: 1px solid currentColor;
+  opacity: 0.15;
+  margin: 2.4em 0;
+}
+.prose-article img {
+  border-radius: 0.5rem;
+  width: 100%;
+  height: auto;
+  margin: 1.6em 0;
+}
+.prose-article strong {
+  font-weight: 600;
+}
+.prose-article code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+  background: rgba(128, 128, 128, 0.15);
+}
+.ProseMirror:focus {
+  outline: none;
+}
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  opacity: 0.4;
+}

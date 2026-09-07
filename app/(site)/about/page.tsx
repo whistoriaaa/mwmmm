@@ -12,6 +12,7 @@ import { MagneticBtn } from "@/components/about/MagneticBtn"
 import { TiltCard } from "@/components/about/TiltCard"
 import { ParallaxPhoto } from "@/components/about/ParallaxPhoto"
 import { SectionTitle } from "@/components/about/SectionTitle"
+import Link from "next/link"
 import { services } from "@/data/services"
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
@@ -278,6 +279,41 @@ export default function AboutPage() {
             </motion.div>
           ))}
         </div>
+      </section>
+
+      {/* ── CERITA ───────────────────────────────────────────── */}
+      <section className="px-6 md:px-16 py-20 md:py-28 max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: true }}
+          className="rounded-2xl p-8 md:p-12 flex flex-col items-start gap-4"
+          style={{ border: "1px solid var(--border-accent)", background: "var(--card-surface)" }}
+        >
+          <span className="text-xs tracking-[0.45em] uppercase" style={{ color: "var(--cyan)", opacity: 0.75 }}>
+            Cerita
+          </span>
+          <h2
+            className="font-light italic leading-tight"
+            style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.6rem, 4vw, 2.6rem)", color: "var(--gold)" }}
+          >
+            Di Balik Cahaya
+          </h2>
+          <p className="text-sm md:text-base leading-relaxed" style={{ color: "var(--text-muted)", maxWidth: "52ch" }}>
+            Catatan proses, cerita dari setiap sesi, dan hal-hal kecil yang membuat sebuah foto terasa hidup.
+          </p>
+          <Link
+            href="/cerita"
+            className="mt-2 inline-flex items-center gap-3 px-6 py-3 rounded-lg text-xs tracking-widest uppercase transition-all duration-300"
+            style={{ border: "1px solid var(--cyan)", color: "var(--cyan)" }}
+          >
+            Baca Cerita
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </motion.div>
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────── */}
