@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
-import { PhotoViewer } from "@/components/kategori/PhotoViewer"
-import { CategoryCard } from "@/components/kategori/CategoryCard"
-import { SitePicture } from "@/components/site/site-picture"
+import { PhotoViewer } from "@/components/site/kategori/PhotoViewer"
+import { CategoryCard } from "@/components/site/kategori/CategoryCard"
+import { Picture } from "@/components/picture"
 import type { SiteCategory, SitePhoto } from "@/lib/queries/site-types"
 
 const MONTHS: Record<string, string> = {
@@ -177,7 +177,7 @@ export function KategoriBrowser({
             className="break-inside-avoid mb-1.5 rounded-lg overflow-hidden cursor-pointer relative group"
             onClick={() => openViewer(list, idx)}
           >
-            <SitePicture
+            <Picture
               photo={photo}
               sizes="50vw"
               priority={idx < eager}

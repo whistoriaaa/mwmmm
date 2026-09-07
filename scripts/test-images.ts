@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs"
-import { processPhoto } from "../lib/images.ts"
+import { processPhoto } from "../lib/storage/images.ts"
 
 const src = process.argv[2] ?? "public/photos/portrait/graduation/aira/1.jpg"
 const buf = readFileSync(src)

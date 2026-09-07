@@ -1,5 +1,5 @@
 import { getSettings } from "@/lib/queries/settings"
-import ContactSection from "@/components/contact/contact-section"
+import ContactSection from "@/components/site/contact/contact-section"
 
 export const dynamic = "force-dynamic"
 

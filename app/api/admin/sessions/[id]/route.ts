@@ -4,7 +4,7 @@ import { and, eq, ne } from "drizzle-orm"
 import { requireAdmin } from "@/lib/auth/guard"
 import { db } from "@/lib/db"
 import { sessions, categories, subcategories, photos } from "@/lib/db/schema"
-import { deleteSession } from "@/lib/photo-storage"
+import { deleteSession } from "@/lib/storage/photos"
 import { slugify } from "@/lib/id"
 
 export const runtime = "nodejs"

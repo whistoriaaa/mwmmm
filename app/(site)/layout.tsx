@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next"
 import { Cormorant_Garamond, Plus_Jakarta_Sans, Dancing_Script } from "next/font/google"
 import "../globals.css"
-import Navbar from "@/components/Navbar"
-import BottomNavBar from "@/components/BottomNavBar"
-import { ThemeProvider } from "@/components/ThemeProvider"
-import { ThemeToggle } from "@/components/ThemeToggle"
-import InstallPWA from "@/components/InstallPWA"
+import Navbar from "@/components/site/Navbar"
+import BottomNavBar from "@/components/site/BottomNavBar"
+import { ThemeProvider } from "@/components/site/ThemeProvider"
+import { ThemeToggle } from "@/components/site/ThemeToggle"
+import InstallPWA from "@/components/site/InstallPWA"
 
 const cormorant = Cormorant_Garamond({
   subsets:  ["latin"],

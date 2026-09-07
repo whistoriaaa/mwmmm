@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm"
 import { requireAdmin } from "@/lib/auth/guard"
 import { db } from "@/lib/db"
 import { photos } from "@/lib/db/schema"
-import { deletePhoto } from "@/lib/photo-storage"
+import { deletePhoto } from "@/lib/storage/photos"
 
 export const runtime = "nodejs"
 

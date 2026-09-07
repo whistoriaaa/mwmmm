@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { listPublishedArticles } from "@/lib/queries/articles"
-import { SitePicture } from "@/components/site/site-picture"
+import { Picture } from "@/components/picture"
 
 export const metadata: Metadata = {
   title: "Cerita — Shobiryne",
@@ -49,7 +49,7 @@ export default async function CeritaPage() {
                   style={{ background: "var(--bg-surface-2)" }}
                 >
                   {a.coverStorageDir && a.coverVariants ? (
-                    <SitePicture
+                    <Picture
                       photo={{
                         storageDir: a.coverStorageDir,
                         variants: a.coverVariants,

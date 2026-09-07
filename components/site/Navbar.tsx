@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "motion/react"
 import { navItems } from "@/data/navigation"
-import { ScrollToTop } from "@/components/navbar/ScrollToTop"
+import { ScrollToTop } from "@/components/site/navbar/ScrollToTop"
 
 export default function Navbar() {
   const pathname    = usePathname()

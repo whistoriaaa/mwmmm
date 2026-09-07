@@ -1,22 +1,29 @@
 import { pictureSources } from "@/lib/img"
-import type { SitePhoto } from "@/lib/queries/site-types"
+import type { PhotoVariant } from "@/lib/db/schema"
 
-type Src = Pick<SitePhoto, "storageDir" | "variants" | "blurDataUrl" | "width" | "height">
+export interface PicturePhoto {
+  storageDir: string
+  variants: PhotoVariant[]
+  blurDataUrl: string
+  width: number
+  height: number
+  alt?: string | null
+}
 
 /**
- * <picture> dari varian pra-generate (AVIF→WebP), blur placeholder saat
- * memuat. Dipakai di seluruh situs publik untuk foto dari CMS.
+ * <picture> dari varian pra-generate (AVIF→WebP) + blur placeholder saat
+ * memuat. Satu komponen untuk semua foto CMS — situs publik & /admin.
  */
-export function SitePicture({
+export function Picture({
   photo,
   sizes,
   className,
   style,
   priority = false,
   fit = "cover",
-  alt = "",
+  alt,
 }: {
-  photo: Src
+  photo: PicturePhoto
   sizes: string
   className?: string
   style?: React.CSSProperties
@@ -33,12 +40,13 @@ export function SitePicture({
         src={s.fallback}
         width={photo.width}
         height={photo.height}
-        alt={alt}
+        alt={alt ?? photo.alt ?? ""}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
         fetchPriority={priority ? "high" : undefined}
         className={className}
         style={{
+          display: "block",
           objectFit: fit,
           backgroundImage: `url("${photo.blurDataUrl}")`,
           backgroundSize: "cover",

@@ -3,7 +3,7 @@ import { eq, sql } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { photos, sessions } from "@/lib/db/schema"
 import { uploadObject, deleteObjects } from "@/lib/storage"
-import { processPhoto, variantMeta, contentTypeFor } from "@/lib/images"
+import { processPhoto, variantMeta, contentTypeFor } from "@/lib/storage/images"
 import { shortId } from "@/lib/id"
 
 /** Prefix URL untuk menyajikan gambar (bucket private → lewat route handler). */

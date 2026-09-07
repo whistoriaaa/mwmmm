@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import type { JSONContent } from "@tiptap/core"
 import { getPublishedArticle } from "@/lib/queries/articles"
 import { renderArticleHtml } from "@/lib/tiptap"
-import { SitePicture } from "@/components/site/site-picture"
+import { Picture } from "@/components/picture"
 
 export const dynamic = "force-dynamic"
 
@@ -63,7 +63,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         {a.coverStorageDir && a.coverVariants && (
           <div className="mt-8 overflow-hidden rounded-xl" style={{ background: "var(--bg-surface-2)" }}>
-            <SitePicture
+            <Picture
               photo={{
                 storageDir: a.coverStorageDir,
                 variants: a.coverVariants,

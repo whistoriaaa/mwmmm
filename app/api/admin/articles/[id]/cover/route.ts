@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm"
 import { requireAdmin } from "@/lib/auth/guard"
 import { db } from "@/lib/db"
 import { articles } from "@/lib/db/schema"
-import { setArticleCover, clearArticleCover } from "@/lib/article-storage"
+import { setArticleCover, clearArticleCover } from "@/lib/storage/articles"
 import { revalidateArticles } from "@/lib/revalidate"
 
 export const runtime = "nodejs"

@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "motion/react"
-import { SitePicture } from "@/components/site/site-picture"
+import { Picture } from "@/components/picture"
 import type { SitePhoto } from "@/lib/queries/site-types"
 
 /**
@@ -46,7 +46,7 @@ export function CategoryCard({ title, meta, preview, onClick, index = 0 }: {
         <div className="absolute inset-0 flex" style={{ background: "var(--bg-surface-2)" }}>
           {preview.slice(0, 4).map((p, i) => (
             <div key={p.id} className="relative flex-1 overflow-hidden">
-              <SitePicture
+              <Picture
                 photo={p}
                 sizes="(min-width: 768px) 13vw, 25vw"
                 priority={index < 3}

@@ -1,5 +1,5 @@
 import { getSiteCatalog } from "@/lib/queries/site"
-import { KategoriBrowser } from "@/components/kategori/kategori-browser"
+import { KategoriBrowser } from "@/components/site/kategori/kategori-browser"
 
 export const dynamic = "force-dynamic"
 

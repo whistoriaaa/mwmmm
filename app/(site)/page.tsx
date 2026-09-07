@@ -1,6 +1,6 @@
-import Parallax from "@/components/Parallax"
-import BioBrief from "@/components/home/BioBrief"
-import RecentWorks from "@/components/home/RecentWorks"
+import Parallax from "@/components/site/Parallax"
+import BioBrief from "@/components/site/home/BioBrief"
+import RecentWorks from "@/components/site/home/RecentWorks"
 import { getRecentWorks, getSiteCatalog } from "@/lib/queries/site"
 
 export const dynamic = "force-dynamic"

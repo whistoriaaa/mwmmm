@@ -1,7 +1,7 @@
 import { revalidateSite } from "@/lib/revalidate"
 import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/auth/guard"
-import { reorderPhotos } from "@/lib/photo-storage"
+import { reorderPhotos } from "@/lib/storage/photos"
 
 export const runtime = "nodejs"
 

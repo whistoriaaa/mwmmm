@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { articles, articleAssets } from "@/lib/db/schema"
 import { uploadObject, deleteObjects, listPrefix } from "@/lib/storage"
-import { processPhoto, variantMeta, contentTypeFor } from "@/lib/images"
+import { processPhoto, variantMeta, contentTypeFor } from "@/lib/storage/images"
 import { shortId } from "@/lib/id"
 import { imgSrc } from "@/lib/img"
 

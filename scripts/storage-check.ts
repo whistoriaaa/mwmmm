@@ -11,7 +11,7 @@ import {
   publicUrl,
   S3_BUCKET,
   S3_PREFIX,
-} from "../lib/storage.ts"
+} from "../lib/storage/s3.ts"
 
 async function main() {
   console.log(`Bucket: ${S3_BUCKET}   Prefix: ${S3_PREFIX || "(none)"}\n`)

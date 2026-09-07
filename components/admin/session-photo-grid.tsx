@@ -22,9 +22,9 @@ import { CSS } from "@dnd-kit/utilities"
 import { GripVertical, Star, Trash2, ImageDown } from "lucide-react"
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
-import { PhotoThumb, type ThumbPhoto } from "@/components/admin/photo-thumb"
+import { Picture, type PicturePhoto } from "@/components/picture"
 
-export interface GridPhoto extends ThumbPhoto {
+export interface GridPhoto extends PicturePhoto {
   id: number
   highlight: boolean
 }
@@ -65,7 +65,7 @@ function Cell({
       )}
     >
       <div className="aspect-square">
-        <PhotoThumb photo={photo} sizes="(min-width:1024px) 220px, 45vw" />
+        <Picture photo={photo} sizes="(min-width:1024px) 220px, 45vw" className="h-full w-full" />
       </div>
 
       <button

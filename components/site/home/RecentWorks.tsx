@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { motion, AnimatePresence } from "motion/react"
 import { useState } from "react"
-import { PhotoViewer } from "@/components/kategori/PhotoViewer"
-import { SitePicture } from "@/components/site/site-picture"
+import { PhotoViewer } from "@/components/site/kategori/PhotoViewer"
+import { Picture } from "@/components/picture"
 import type { SitePhoto } from "@/lib/queries/site-types"
 
 const MONTHS: Record<string, string> = {
@@ -112,7 +112,7 @@ export default function RecentWorks({
                     whileTap={{ scale: 0.97 }}
                     onClick={() => openViewer(list, idx)}
                   >
-                    <SitePicture
+                    <Picture
                       photo={photo}
                       sizes="(min-width: 768px) 298px, 50vw"
                       priority={mi === 0 && idx < 4}

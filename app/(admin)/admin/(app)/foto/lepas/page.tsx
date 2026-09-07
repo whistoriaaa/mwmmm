@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
 import { getLoosePhotos, listCategories } from "@/lib/queries/catalog"
-import { PhotoThumb } from "@/components/admin/photo-thumb"
+import { Picture } from "@/components/picture"
 import { PhotoActions } from "@/components/admin/photo-actions"
 
 export const metadata = { title: "Foto lepas" }
@@ -41,7 +41,7 @@ export default async function LoosePage() {
               {list.map((p) => (
                 <div key={p.id} className="group relative overflow-hidden rounded-lg border bg-muted">
                   <div className="aspect-square">
-                    <PhotoThumb photo={p} sizes="(min-width:1024px) 220px, 45vw" />
+                    <Picture photo={p} sizes="(min-width:1024px) 220px, 45vw" className="h-full w-full" />
                   </div>
                   {p.highlight && (
                     <span className="pointer-events-none absolute right-1.5 top-1.5 rounded-md bg-background/80 p-1 backdrop-blur">
