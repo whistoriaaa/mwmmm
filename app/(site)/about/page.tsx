@@ -203,6 +203,25 @@ export default function AboutPage() {
               </motion.span>
             ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="pt-4"
+          >
+            <Link
+              href="/cv"
+              className="inline-flex items-center gap-2 text-xs tracking-widest uppercase transition-colors"
+              style={{ color: "var(--cyan)" }}
+            >
+              Lihat CV lengkap
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </motion.div>
         </motion.div>
       </section>
 
