@@ -23,7 +23,7 @@ const TRAVEL = TRACK_W - THUMB - PAD * 2
  * Switch bergaya shadcn/ui — track glassmorphism, thumb geser dengan
  * animasi spring, ikon crossfade. Tanpa dependency (pakai `motion`).
  */
-export function Switch({
+export function GlassSwitch({
   checked,
   onCheckedChange,
   disabled,

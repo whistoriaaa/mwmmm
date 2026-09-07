@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTheme } from "@/components/ThemeProvider"
-import { Switch } from "@/components/ui/switch"
+import { GlassSwitch } from "@/components/GlassSwitch"
 
 const SunIcon = (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -33,7 +33,7 @@ export function ThemeToggle() {
   const isDark = mounted && theme === "dark"
 
   return (
-    <Switch
+    <GlassSwitch
       checked={isDark}
       onCheckedChange={toggle}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
