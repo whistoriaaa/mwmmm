@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Cormorant_Garamond, Plus_Jakarta_Sans, Dancing_Script } from "next/font/google"
-import "./globals.css"
+import "../globals.css"
 import Navbar from "@/components/Navbar"
 import BottomNavBar from "@/components/BottomNavBar"
 import { ThemeProvider } from "@/components/ThemeProvider"
