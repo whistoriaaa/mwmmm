@@ -1,7 +1,29 @@
 import type { NextConfig } from "next";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+/**
+ * Akar proyek dengan casing drive yang benar (mis. "C:\...").
+ * Di Windows, cwd yang diteruskan ke proses kadang berhuruf kecil
+ * ("c:\...") sehingga Turbopack gagal mencocokkan path dan menaikkan
+ * pencarian modul ke folder induk (C:\Test) — memicu scan folder lain
+ * dan akhirnya kehabisan memori. Menetapkan root secara eksplisit
+ * mencegah hal itu.
+ */
+const projectRoot = (() => {
+  try {
+    return path.dirname(fileURLToPath(import.meta.url));
+  } catch {
+    return process.cwd().replace(/^[a-z]:/, (s) => s.toUpperCase());
+  }
+})();
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
+  turbopack: {
+    root: projectRoot,
+  },
+  outputFileTracingRoot: projectRoot,
   images: {
     remotePatterns: [
       {
