@@ -71,7 +71,7 @@ export default function InstallPWA() {
           exit={{ y: 40, opacity: 0 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="fixed left-4 right-4 z-60 md:left-auto md:right-6 md:w-80"
-          style={{ bottom: "calc(env(safe-area-inset-bottom) + 84px)" }}
+          style={{ bottom: "calc(env(safe-area-inset-bottom) + 9.5rem)" }}
         >
           <div
             className="flex items-center gap-3 rounded-xl px-4 py-3"

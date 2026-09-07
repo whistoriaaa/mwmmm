@@ -70,8 +70,14 @@ export default function RootLayout({
         <ThemeProvider>
           <div className="fixed inset-0 -z-10" style={{ backgroundColor: "var(--background)" }} />
           <Navbar />
-          {/* Toggle fixed pojok kanan atas, selalu di atas semua layer */}
-          <div className="fixed top-3 right-3 z-70">
+          {/* Toggle fixed pojok kanan atas, di bawah status bar iOS (safe-area) */}
+          <div
+            className="fixed z-70"
+            style={{
+              top: "calc(env(safe-area-inset-top) + 0.6rem)",
+              right: "calc(env(safe-area-inset-right) + 0.85rem)",
+            }}
+          >
             <ThemeToggle />
           </div>
           <main>{children}</main>

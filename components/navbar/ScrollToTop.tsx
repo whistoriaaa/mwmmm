@@ -22,8 +22,10 @@ export function ScrollToTop() {
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top"
-          className="fixed bottom-20 right-4 z-50 w-11 h-11 flex items-center justify-center rounded-full border"
+          className="fixed z-50 w-11 h-11 flex items-center justify-center rounded-full border"
           style={{
+            bottom: "calc(env(safe-area-inset-bottom) + 5.5rem)",
+            right: "calc(env(safe-area-inset-right) + 1rem)",
             background: "var(--bottom-nav-bg)",
             borderColor: "var(--cyan)",
             color: "var(--cyan)",
