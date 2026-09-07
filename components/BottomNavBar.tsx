@@ -58,15 +58,15 @@ export default function BottomNavBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div
-        className="rounded-2xl"
+        className="rounded-full"
         style={{
           background: "var(--bottom-nav-bg)",
-          backdropFilter: "blur(24px)",
-          border: "1px solid var(--nav-border)",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.18)",
+          backdropFilter: "blur(44px) saturate(185%)",
+          WebkitBackdropFilter: "blur(44px) saturate(185%)",
+          boxShadow: "var(--glass-float)",
         }}
       >
-        <ul className="flex items-center justify-around px-2 py-1.5">
+        <ul className="flex items-center justify-around px-3 py-1.5">
           {navItems.map((item) => {
             const isActive = item.href === "/#works" ? false : pathname === item.href
             return (

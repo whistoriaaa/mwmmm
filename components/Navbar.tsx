@@ -40,10 +40,19 @@ export default function Navbar() {
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="fixed top-0 left-0 right-0 z-50"
         >
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: "var(--navbar-bg)",
+              backdropFilter: "blur(30px) saturate(185%)",
+              WebkitBackdropFilter: "blur(30px) saturate(185%)",
+              boxShadow: "var(--glass-edge)",
+            }}
+          />
           <motion.div
-            className="absolute inset-0 backdrop-blur-md"
+            className="absolute inset-0 pointer-events-none"
             animate={{ opacity: pastHero ? 1 : 0 }}
-            style={{ backgroundColor: "var(--navbar-bg)" }}
+            style={{ boxShadow: "0 10px 34px -12px rgba(0,0,0,0.28)" }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
           />
           <motion.div

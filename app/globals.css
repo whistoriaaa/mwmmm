@@ -29,12 +29,31 @@ main {
   --border:        rgba(26, 16, 8, 0.10);
   --border-accent: rgba(255, 127, 17, 0.35);
 
-  --navbar-bg:      rgba(255, 255, 255, 0.78);
-  --bottom-nav-bg:  rgba(255, 248, 243, 0.97);
+  --navbar-bg:      rgba(255, 255, 255, 0.26);
+  --bottom-nav-bg:  rgba(255, 248, 243, 0.18);
   --nav-border:     rgba(26, 16, 8, 0.10);
-  --nav-inactive:   rgba(26, 16, 8, 0.38);
+  --nav-inactive:   rgba(26, 16, 8, 0.62);
   --sticky-bg:      rgba(255, 255, 255, 0.88);
   --card-surface:   rgba(255, 127, 17, 0.06);
+
+  /* Glassmorphism edge — rim cahaya yang mengelilingi seluruh komponen */
+  --glass-highlight: rgba(255, 255, 255, 0.65);  /* tepi atas, paling terang */
+  --glass-ring:      rgba(255, 255, 255, 0.24);  /* garis tipis keliling penuh */
+  --glass-lowlight:  rgba(20, 12, 4, 0.06);      /* bayangan dalam bawah, kedalaman */
+  --glass-shadow:    rgba(20, 12, 4, 0.16);      /* bayangan luar */
+
+  /* Rim mengelilingi seluruh sisi (atas lebih terang) + kedalaman bawah */
+  --glass-edge:
+    inset 0 0 0 1px var(--glass-ring),
+    inset 0 1.5px 0 var(--glass-highlight),
+    inset 0 -6px 12px -6px var(--glass-lowlight);
+  /* Sama seperti --glass-edge, ditambah bayangan luar yang melingkar penuh */
+  --glass-float:
+    inset 0 0 0 1px var(--glass-ring),
+    inset 0 1.5px 0 var(--glass-highlight),
+    inset 0 -6px 12px -6px var(--glass-lowlight),
+    0 8px 30px -10px var(--glass-shadow),
+    0 0 18px -4px var(--glass-shadow);
 }
 
 /* ── Dark mode ────────────────────────────────────────────── */
@@ -55,12 +74,18 @@ main {
   --border:        rgba(240, 236, 228, 0.08);
   --border-accent: rgba(34, 179, 208, 0.25);
 
-  --navbar-bg:      rgba(14, 40, 48, 0.72);
-  --bottom-nav-bg:  rgba(14, 18, 22, 0.94);
+  --navbar-bg:      rgba(14, 40, 48, 0.22);
+  --bottom-nav-bg:  rgba(14, 18, 22, 0.15);
   --nav-border:     rgba(255, 255, 255, 0.07);
-  --nav-inactive:   rgba(255, 255, 255, 0.38);
+  --nav-inactive:   rgba(255, 255, 255, 0.62);
   --sticky-bg:      rgba(33, 32, 40, 0.88);
   --card-surface:   rgba(14, 40, 48, 0.30);
+
+  /* Glassmorphism edge — rim cahaya yang mengelilingi seluruh komponen */
+  --glass-highlight: rgba(255, 255, 255, 0.28);
+  --glass-ring:      rgba(255, 255, 255, 0.16);
+  --glass-lowlight:  rgba(0, 0, 0, 0.30);
+  --glass-shadow:    rgba(0, 0, 0, 0.50);
 }
 
 html, body {
