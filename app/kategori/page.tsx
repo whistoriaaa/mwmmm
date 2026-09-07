@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react"
 import Image from "next/image"
 import { categoryDefs, allCategoryPhotos, type MainCat, type SubCat, type Photo } from "@/data/categories"
 import { PhotoViewer } from "@/components/kategori/PhotoViewer"
+import { GroupCard, type GroupCardData } from "@/components/kategori/GroupCard"
 
 const MONTHS: Record<string, string> = {
   "01": "Januari", "02": "Februari", "03": "Maret",
@@ -67,8 +68,31 @@ export default function KategoriPage() {
 
   const activeDef = categoryDefs.find(c => c.key === mainCat)
 
-  // Kelompokkan per bulan saat subcategory aktif
-  const groupedByMonth = subCat
+  const subLabelOf = (key?: SubCat) =>
+    key ? categoryDefs.flatMap(c => c.subs ?? []).find(s => s.key === key)?.label ?? null : null
+
+  // ── Kartu sesi (menggantikan chip sub-kategori paling bawah) ──
+  const groupCards: GroupCardData[] = availableGroups.map(name => {
+    const photos  = preGroupFiltered.filter(p => p.group === name)
+    const ranked  = [...photos].sort((a, b) => (b.highlight ? 1 : 0) - (a.highlight ? 1 : 0))
+    const dateStr = photos.find(p => p.date)?.date
+    return {
+      name,
+      photos,
+      preview:   ranked.slice(0, 5),
+      subLabel:  !subCat ? subLabelOf(photos[0]?.sub) : null,
+      dateLabel: dateStr ? formatMonth(dateStr) : null,
+    }
+  })
+
+  // Foto tanpa grup dalam filter aktif (ditampilkan di bawah kartu)
+  const looseInFilter = preGroupFiltered.filter(p => !p.group)
+
+  // Kartu sesi hanya muncul setelah masuk ke sebuah kategori utama
+  const showGroupCards = groupCards.length > 0 && !group && mainCat !== null
+
+  // Kelompokkan per bulan saat subcategory / sesi aktif
+  const groupedByMonth = (subCat || group)
     ? filtered.reduce<Record<string, Photo[]>>((acc, p) => {
         const key = p.date ?? "unknown"
         if (!acc[key]) acc[key] = []
@@ -199,69 +223,104 @@ export default function KategoriPage() {
               )}
             </AnimatePresence>
 
-            {/* ── Group chips (per orang / pasangan / trip) ── */}
+            {/* ── Sesi aktif / kembali ke daftar kartu ── */}
             <AnimatePresence>
-              {availableGroups.length > 0 && (
+              {group && (
                 <motion.div
-                  key="groups"
+                  key="active-group"
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                   className="overflow-hidden"
                 >
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar pt-2 pb-1">
-                    <button
-                      onClick={() => setGroup(null)}
-                      className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200"
-                      style={{
-                        background: !group ? "var(--bg-surface-2)" : "transparent",
-                        color:      !group ? "var(--cyan)"          : "var(--text-faint)",
-                        border:     `1px solid ${!group ? "var(--cyan)" : "var(--border)"}`,
-                      }}
-                    >
-                      Semua
-                    </button>
-
-                    {availableGroups.map(g => (
-                      <button
-                        key={g}
-                        onClick={() => setGroup(prev => prev === g ? null : g)}
-                        className="flex-none px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200 whitespace-nowrap"
-                        style={{
-                          background: group === g ? "var(--bg-surface-2)" : "transparent",
-                          color:      group === g ? "var(--cyan)"          : "var(--text-faint)",
-                          border:     `1px solid ${group === g ? "var(--cyan)" : "var(--border)"}`,
-                        }}
-                      >
-                        {g}
-                      </button>
-                    ))}
-                  </div>
+                  <button
+                    onClick={() => setGroup(null)}
+                    className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] tracking-wider uppercase transition-all duration-200"
+                    style={{ background: "var(--bg-surface-2)", color: "var(--cyan)", border: "1px solid var(--cyan)" }}
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                    {group}
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* ── Jumlah foto ── */}
+            {/* ── Jumlah foto / sesi ── */}
             <div className="py-2">
               <motion.span
-                key={filtered.length}
+                key={`${showGroupCards}-${filtered.length}`}
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-[11px] tracking-wider"
                 style={{ color: "var(--text-faint)" }}
               >
-                {filtered.length} foto
+                {showGroupCards
+                  ? `${groupCards.length} sesi · ${preGroupFiltered.length} foto`
+                  : `${filtered.length} foto`}
               </motion.span>
             </div>
           </div>
         </div>
 
-        {/* ── Photo grid ── */}
+        {/* ── Konten ── */}
         <div className="px-2 pt-3 md:px-6">
-          {filtered.length > 0 ? (
-            subCat && groupedByMonth ? (
-              /* ── Tampilan per bulan saat subcategory dipilih ── */
+          {showGroupCards ? (
+            /* ── Kartu sesi (sub-kategori paling bawah) ── */
+            <div>
+              <div className="grid gap-3 md:grid-cols-2 px-1">
+                {groupCards.map((card, i) => (
+                  <GroupCard
+                    key={card.name}
+                    data={card}
+                    index={i}
+                    onClick={() => {
+                      setGroup(card.name)
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }}
+                  />
+                ))}
+              </div>
+
+              {looseInFilter.length > 0 && (
+                <div className="mt-9">
+                  <div className="flex items-center gap-3 mb-3 px-1">
+                    <span className="text-[10px] tracking-[0.4em] uppercase whitespace-nowrap" style={{ color: "var(--text-faint)" }}>
+                      Foto lepas
+                    </span>
+                    <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+                    <span className="text-[10px] tracking-wider" style={{ color: "var(--text-faint)" }}>
+                      {looseInFilter.length} foto
+                    </span>
+                  </div>
+                  <div style={{ columns: "2 160px", columnGap: "6px" }}>
+                    {looseInFilter.map((photo, idx) => (
+                      <div
+                        key={photo.id}
+                        className="break-inside-avoid mb-1.5 rounded-lg overflow-hidden cursor-pointer relative group"
+                        onClick={() => openViewer(looseInFilter, idx)}
+                      >
+                        <Image
+                          src={photo.src}
+                          alt=""
+                          width={photo.w}
+                          height={photo.h}
+                          sizes="50vw"
+                          className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                          loading={idx < 6 ? "eager" : "lazy"}
+                        />
+                        <PhotoInfoBadge photo={photo} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : filtered.length > 0 ? (
+            (subCat || group) && groupedByMonth ? (
+              /* ── Tampilan per bulan saat subcategory / sesi dipilih ── */
               <div>
                 {sortedMonthKeys.map((monthKey, mi) => {
                   const monthPhotos = groupedByMonth[monthKey]
