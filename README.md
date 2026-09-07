@@ -27,7 +27,6 @@ Buat hash password lain: `npm run auth:hash -- 'passwordbaru'` → isi `ADMIN_PA
 | `npm run db:studio` | Drizzle Studio (GUI DB) |
 | `npm run auth:hash -- '…'` | cetak bcrypt hash |
 | `npm run storage:check` | tes koneksi object storage |
-| `npm run migrate:photos` | migrasi `public/photos` → object storage + DB (idempoten) |
 
 ## Struktur
 

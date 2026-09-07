@@ -43,3 +43,9 @@ next-env.d.ts
 
 # local sqlite db
 /.data/
+
+# foto katalog sudah pindah ke object storage (lihat CMS /admin/foto).
+# File asli tetap di disk sebagai cadangan lokal, tidak lagi dilacak git.
+/public/photos/portrait/
+/public/photos/special/
+/public/photos/event/
